@@ -1,4 +1,4 @@
-package logic.objects;
+package app.logic.model.objects;
 
 public enum UserStatus {
    ENABLED,

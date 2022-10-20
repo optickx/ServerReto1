@@ -1,4 +1,4 @@
-package logic.objects;
+package app.logic.model.objects;
 
 public class Message {
     private User user;

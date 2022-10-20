@@ -1,4 +1,4 @@
-package logic.objects;
+package app.logic.model.objects;
 
 import java.sql.Timestamp;
 
