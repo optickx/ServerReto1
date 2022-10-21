@@ -1,4 +1,4 @@
-package app.logic.model.objects;
+package logic.objects;
 
 import java.security.Timestamp;
 import java.util.Collection;
@@ -39,6 +39,9 @@ public class User implements Comparable <User> {
         this.lastPasswordChange = pLastPasswordChange;
         this.status = pStatus;
         this.privilege = pPrivilege; 
+    }
+
+    public User() {
     }
 
     // Getters.

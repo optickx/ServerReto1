@@ -1,4 +1,4 @@
-package app.logic.model;
+package logic.model;
 
 public interface IDBReader {
     
