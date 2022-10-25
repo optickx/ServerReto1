@@ -28,10 +28,11 @@ public class DBReaderImplementation implements IDBReader {
                 stmt.setString(2, pUser.getPassword());
             rs = stmt.executeQuery();
 
-            if (rs.next())
-                
+            
         } catch (SQLException sqle) {
             sqle.printStackTrace();
+        } catch (NullPointerException npe) {
+            // TODO: error, return message
         }
         return null;
     }
