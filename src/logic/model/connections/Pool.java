@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package reto1server;
+package logic.model.connections;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -13,9 +13,9 @@ import java.util.ArrayList;
  * @author 2dam
  */
 public class Pool {
-   SQLAccess sql = new SQLAccess();
-   ArrayList<SConnection> connections = new ArrayList<SConnection>();
-   SConnection con = null;
+   private SQLAccess sql = new SQLAccess();
+   private static ArrayList<SConnection> connections = new ArrayList<SConnection>();
+   private SConnection con = null;
    
    public Connection getConnection(){
        for(int i = 0; i < connections.size(); i++){
