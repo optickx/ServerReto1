@@ -1,0 +1,55 @@
+@startuml server
+
+skinparam linetype ortho
+
+class Application {
+    __
+    Infinite loop that creates threads.
+}
+
+class ServerSocket {
+    __
+    Waits requests from the Network.
+}
+
+class Socket {
+    __
+}
+
+class Thread {
+}
+
+class DAOFactory {
+    __
+    Returns DBReadable implemented (as DBReader)
+}
+
+interface IDBReader {
+    __
+    +void login()
+    +void register() 
+    __
+    Methods to be implemented by DAO.
+} 
+
+class DBReaderImplementation {
+    __
+    Reads data from SQL database.
+}
+
+class Pool {
+}
+
+Application -- ServerSocket
+ServerSocket -right- Socket
+Thread -- Socket
+
+DAOFactory <|-- Thread
+IDBReader -left- DAOFactory
+IDBReader <|-- DBReaderImplementation
+Pool -up- DBReaderImplementation
+
+Message -- User
+
+
+@enduml
