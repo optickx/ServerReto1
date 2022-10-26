@@ -1,141 +1,211 @@
 package logic.model;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.sql.*;
 import java.util.List;
+import java.util.ArrayList;
 
-import logic.objects.User;
-import logic.objects.UserPrivilege;
-import logic.objects.UserStatus;
+import logic.objects.*;
 
 public class DBReaderImplementation implements IDBReader {
-    /**the value of the connection is given
-     * at the constructor. should be used
+
+    /**
+     * the value of the connection is given
+     * at the constructor. should be used with
+     * every database usage in this class.
      */
+
     private final Connection con;
-    private ResultSet rs;
+
+    /**
+     * to the database is necessary to give a connection
+     * to this database.
+     * 
+     * @param pConnection will be used by every module.
+     */
 
     public DBReaderImplementation(Connection pConnection) {
         con = pConnection;
     }
-    
+
+    /**
+     * selects a user from the table using
+     * the values of the login and the password.
+     * theoretically, the user should have only,
+     * and this means ONLY, the login and the password.
+     * 
+     * @param pUser object that contains the credentials.
+     * @return a new User with all it's data.
+     * if there's nothing found, an empty (null) value.
+     */
+
     @Override
     public User signIn(User pUser) {
         try {
             stmt = con.prepareStatement(signIn);
-                stmt.setString(1, pUser.getLogin());
-                stmt.setString(2, pUser.getPassword());
-            rs = stmt.executeQuery();
+            stmt.setString(1, pUser.getLogin());
+            stmt.setString(2, pUser.getPassword());
+            ResultSet rs = stmt.executeQuery();
+
+            /**
+             * the values of the last SignIns are obtained
+             * by using the ID to seach it.
+             */
 
             if (rs.next())
-                return 
-                    new User(
-                    rs.getInt(1),
-                    rs.getString(2),
-                    rs.getString(3),
-                    rs.getString(4),
-                    rs.getString(5),
-                    rs.getTimestamp(6),
-                    rs.getInt(7),
-                    rs.getInt(8),
-                    getLastSignIns(pUser.getLogin()));
+                return new User(
+                        rs.getInt(1),
+                        rs.getString(2),
+                        rs.getString(3),
+                        rs.getString(4),
+                        rs.getString(5),
+                        rs.getTimestamp(6),
+                        rs.getInt(7),
+                        rs.getInt(8),
+                        selectLastSignIns(rs.getInt(0)));
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         } catch (NullPointerException npe) {
+            // this should never happen.
             npe.printStackTrace();
         }
+
         return null;
     }
-    /**@param pLogin is the login of the user whose last
-     * logins we want to know.
+
+    /**
+     * @param pID is the ID of the user whose logins
+     *            will be searched.
      * @return a List of Timestamps, chronologically sorted.
      */
-    private List <Timestamp> getLastSignIns(String pLogin) {
-        List <Timestamp> l =
-            new ArrayList <Timestamp> ();
-        
+
+    private List<Timestamp> selectLastSignIns(int pID) {
+        List<Timestamp> l = 
+            new ArrayList<Timestamp>();
+
         try {
             stmt = con.prepareStatement(lastSignIns);
-                stmt.setString(0, pLogin);
-            rs = stmt.executeQuery();
-            
+            stmt.setInt(0, pID);
+                ResultSet rs = stmt.executeQuery();
+
             while (rs.next())
                 l.add(rs.getTimestamp(1));
 
         } catch (SQLException sqle) {
-           sqle.printStackTrace();
+            sqle.printStackTrace();
         }
 
         l.stream()
-            .sorted((t1, t2) -> t1.compareTo(t2));
+                .sorted((t1, t2) -> t1.compareTo(t2));
+
         return l;
     }
 
-
+    /**
+     * method that writes a new User to the database.
+     * 
+     * @param pUser is the user to be written.
+     * the attributes CANNOT BE NULL.
+     */
     @Override
     public User signUp(User pUser) {
         try {
             stmt = con.prepareStatement(signUp);
-                stmt.setInt(0, count() + 1);
-                stmt.setString(1, pUser.getLogin());
-                stmt.setString(2, pUser.getEmail());
-                stmt.setString(3, pUser.getFullName());
-                stmt.setString(4, pUser.getPassword());
-                stmt.setTimestamp(5, pUser.getLastPasswordChange());
-                stmt.setInt(6, 
+            stmt.setInt(0, generateID());
+            stmt.setString(1, pUser.getLogin());
+            stmt.setString(2, pUser.getEmail());
+            stmt.setString(3, pUser.getFullName());
+            stmt.setString(4, pUser.getPassword());
+            stmt.setTimestamp(5, pUser.getLastPasswordChange());
+            
+            stmt.setInt(6,
                     (pUser.getPrivilege() == UserPrivilege.ADMIN) ? 1 : 0);
-                
-                stmt.setInt(7,
+
+            stmt.setInt(7,
                     (pUser.getStatus() == UserStatus.ENABLED) ? 1 : 0);
 
-                stmt.executeUpdate();
+            stmt.executeUpdate();
 
-                return pUser;
-                
+            return pUser;
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         }
         return null;
     }
-    /**@return the exact number of users in the table.
-     * it can be used to generate the user ID.
-    */
-    private int count() {
-        int c = 0;
-        /**note that the PreparedStatement is not being used.
-         * if we did, we would modify the prepared statement 
-         * from the function calling this code and this would
-         * give errors.
-         */
+
+    /**
+     * this method generates the ID 
+     * correspondant to the new user to be written
+     * to this database. in any case, it's an ID
+     * that IT'S NOT BEING USED YET.
+     * 
+     * @return a new ID.
+     */
+    
+    public int generateID() {
+        List <Integer> l = 
+            new ArrayList<Integer>();
+
         try {
-            rs = con.prepareStatement(count).executeQuery();
-            if (rs.next())
-                c = rs.getInt(1);
+
+            /**
+             * note that the PreparedStatement is not being used.
+             * if we did, we would modify the prepared statement
+             * from the function calling this code and this could
+             * give errors.
+             */
+
+            ResultSet rs = con.prepareStatement(everyID)
+                    .executeQuery();
+
+            while (rs.next())
+                l.add(rs.getInt(0));
+
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         }
 
-        return c;
+        if (l.isEmpty())
+            return 1;
+
+        else if (l.contains(l.size()))
+            return l.size() + 1;
+
+        /**
+         * in case of not having a "perfect" case
+         * of IDs, we give the new one.
+         */
+        return l.stream()
+            .max((i1, i2) -> i1 - i2).get() + 1;
+
+    }   
+
+    /**
+     * just a simple getter.
+     * @return the connection being 
+     * used in this class.
+     */
+
+    public Connection getConnection() {
+        return con;
     }
 
     // we do not have to create in every module.
     private PreparedStatement stmt;
-    
-    private final String count =
+
+    private final String count = 
         "SELECT COUNT(*) FROM user";
 
-    private final String lastSignIns =
-        "SELECT lastSignIn from signIn WHERE id = ?";
+    private final String everyID = 
+        "SELECT ID from user";
 
-    private final String signUp =
+    private final String lastSignIns =
+         "SELECT lastSignIn from signIn WHERE id = ?";
+
+    private final String signUp = 
         "INSERT INTO USER VALUES (?, ?, ?, ?, ?, ?, ?, ?), COUNT(*)";
 
-    private final String signIn =
+    private final String signIn = 
         "SELECT login, password FROM user WHERE login = ? AND password = ?";
 }
