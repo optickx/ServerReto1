@@ -106,8 +106,11 @@ public class User implements Comparable <User> {
         lastLogins = pLastLogins;
     }
     private String lastLoginString() {
-        // TODO: generate string.
-        return null;
+        String ls = "";
+        lastLogins
+            .stream()
+            .forEach(t -> ls.concat("\n" + t.toString()));
+        return ls;
     }
 
     @Override
