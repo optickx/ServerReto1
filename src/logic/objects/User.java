@@ -1,6 +1,6 @@
 package logic.objects;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class User implements Comparable <User> {
@@ -22,7 +22,7 @@ public class User implements Comparable <User> {
 
     public User(
     int pID, String pLogin, String pEmail, String pFullName,
-    String pPassword, int pLastPasswordChange,
+    String pPassword, Timestamp pLastPasswordChange,
     int pStatus, int pPrivilege, List <Timestamp> pLastLogins) {
         
         status = 
