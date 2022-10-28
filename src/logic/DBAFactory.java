@@ -1,15 +1,25 @@
 package logic;
 
+import java.sql.Connection;
+
 import logic.model.DBReaderImplementation;
 import logic.model.IDBReader;
 
 public abstract class DBAFactory {
     private static IDBReader idbr = null;
 
-    public IDBReader get() {
+    public static IDBReader getAccess() {
         if (idbr == null)
-            idbr = new DBReaderImplementation(null);
+            idbr = 
+                new DBReaderImplementation(
+                    Pool.getConnection());
         
-            return idbr;
+        return idbr;
+    }
+
+    /** delete after testing.
+     */
+    public static void provisionalSystemStartConnection(Connection pConnection) {
+        idbr = new DBReaderImplementation(pConnection);
     }
 }

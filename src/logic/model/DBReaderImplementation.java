@@ -53,8 +53,9 @@ public class DBReaderImplementation implements IDBReader {
 
             if (rs.next())
               
-                return new User();
-                /*        rs.getInt(1),
+                return 
+                        new User(
+                        rs.getInt(1),
                         rs.getString(2),
                         rs.getString(3),
                         rs.getString(4),
@@ -62,7 +63,7 @@ public class DBReaderImplementation implements IDBReader {
                         rs.getTimestamp(6),
                         rs.getInt(7),
                         rs.getInt(8),
-                        selectLastSignIns(rs.getInt(0)));*/
+                        selectLastSignIns(rs.getInt(0)));
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
