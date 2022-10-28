@@ -1,3 +1,4 @@
+/*
 package logic;
 
 import logic.model.DBReaderImplementation;
@@ -13,3 +14,4 @@ public abstract class DBAFactory {
             return idbr;
     }
 }
+*/

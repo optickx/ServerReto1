@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import logic.objects.*;
+import pool.CPool;
 
 public class DBReaderImplementation implements IDBReader {
 
@@ -13,8 +14,7 @@ public class DBReaderImplementation implements IDBReader {
      * at the constructor. should be used with
      * every database usage in this class.
      */
-
-    private final Connection con;
+    private Connection con;
 
     /**
      * to the database is necessary to give a connection
@@ -23,8 +23,9 @@ public class DBReaderImplementation implements IDBReader {
      * @param pConnection will be used by every module.
      */
 
-    public DBReaderImplementation(Connection pConnection) {
-        con = pConnection;
+    public DBReaderImplementation() {
+        CPool pool = new CPool();
+        this.con = pool.getConnection();
     }
 
     /**
