@@ -36,7 +36,7 @@ public class Controller {
                 System.out.println(request.getUser().getLogin());
                 System.out.println(request.getUser().getPassword());
                 cont++;
-                thread = new SThread(socket);
+                thread = new SThread(request);
                 thread.start();
             }
         } catch (ServerCapacityException e) {

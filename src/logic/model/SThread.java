@@ -11,35 +11,35 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import logic.objects.message.Request;
+import logic.objects.message.types.RequestType;
 
 /**
  *
  * @author 2dam
  */
-public class SThread extends Thread{
-    private Socket socket;
+public class SThread extends Thread {
+
     private Request request;
-    
-    public SThread(Socket socket){
-        this.socket = socket;
+
+    public SThread(Request request) {
+        this.request = request;
     }
-    
-    public void run(){
-        ObjectOutputStream write = null;
-        ObjectInputStream read = null;
-        try{
-            read = new ObjectInputStream(socket.getInputStream());
-            request = (Request) read.readObject();
+
+    public void run() {
+        try {
             IDBReader dbReader = DBReaderFactory.getAccess();
-            if(request.getRequestType().equals("SIGNIN")){
-                System.out.println("logic.model.SThread.run()");
-            }
-            if(request.getRequestType().equals("SIGNUP")){
-                System.out.println("signup");
-            }
-        } catch(Exception e){
             
+            if (request.getRequestType().equals(RequestType.SIGNIN)) {
+                dbReader.signIn(request.getUser());
+            }
+            if (request.getRequestType().equals(RequestType.SIGNUP)) {
+                dbReader.signUp(request.getUser());
+            }
+            
+
+        } catch (Exception e) {
+
         }
-        
+
     }
 }
