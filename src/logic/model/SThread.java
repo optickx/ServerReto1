@@ -5,13 +5,16 @@
  */
 package logic.model;
 
+import except.EmailExistsException;
 import except.LoginCredentialException;
+import except.LoginExistsException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.objects.User;
@@ -57,15 +60,21 @@ public class SThread extends Thread {
 
         } catch (LoginCredentialException e) {
             response = new Response(null, ResponseType.LOGIN_CREDENTIAL_ERROR);
+        } catch (SQLException e) {
+            response = new Response(null, ResponseType.DATABASE_ERROR);
+        } catch (EmailExistsException e) {
+            response = new Response(null, ResponseType.EMAIL_EXISTS_ERROR);
+        } catch (LoginExistsException e) {
+            response = new Response(null, ResponseType.LOGIN_EXISTS_ERROR);
         } catch (Exception e) {
-                response = new Response(null, ResponseType.OK);
+            response = new Response(null, ResponseType.OK);
         } finally {
             try {
                 write.writeObject(response);
                 write.close();
                 read.close();
             } catch (IOException ex) {
-                Logger.getLogger(SThread.class.getName()).log(Level.SEVERE, null, ex);
+                //Logger.getLogger(SThread.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }

@@ -1,9 +1,12 @@
 package logic.model;
 
+import except.EmailExistsException;
+import except.LoginExistsException;
 import except.UserExistsException;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
+import javax.security.auth.login.LoginException;
 
 import logic.objects.*;
 import pool.CPool;
@@ -105,6 +108,13 @@ public class DBReaderImplementation implements IDBReader {
     @Override
     public User signUp(User user) {
         try {
+            stmt = con.prepareStatement(loginExistsCheck);
+            stmt.setString(0, user.getLogin());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next() == false) {
+                throw new LoginExistsException();
+            }
+            
             stmt = con.prepareStatement(signUp);
             stmt.setInt(0, generateID());
             stmt.setString(1, user.getLogin());
@@ -121,11 +131,13 @@ public class DBReaderImplementation implements IDBReader {
 
             int exceptionCheck = stmt.executeUpdate();
             if (exceptionCheck == 2) {
-                throw new UserExistsException();
+                throw new EmailExistsException();
             }
 
-        } catch (UserExistsException e) {
+        } catch (LoginExistsException e) {
 
+        } catch (EmailExistsException e) {
+            
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         }
