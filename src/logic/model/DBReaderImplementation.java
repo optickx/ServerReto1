@@ -52,8 +52,6 @@ public class DBReaderImplementation implements IDBReader {
              */
 
             if (rs.next())
-<<<<<<< HEAD
-                System.out.println(rs.toString());
                 return 
                     new User(
                     rs.getInt(1),
@@ -65,18 +63,6 @@ public class DBReaderImplementation implements IDBReader {
                     rs.getInt(7),
                     rs.getInt(8),
                     null/*getLastSignIns(pUser.getLogin())*/);
-=======
-                return new User(
-                        rs.getInt(1),
-                        rs.getString(2),
-                        rs.getString(3),
-                        rs.getString(4),
-                        rs.getString(5),
-                        rs.getTimestamp(6),
-                        rs.getInt(7),
-                        rs.getInt(8),
-                        selectLastSignIns(rs.getInt(0)));
->>>>>>> c7e4e35d804d6d99ac98b9d199c2f1122749ac58
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
@@ -100,15 +86,10 @@ public class DBReaderImplementation implements IDBReader {
 
         try {
             stmt = con.prepareStatement(lastSignIns);
-<<<<<<< HEAD
-                stmt.setString(1, pLogin);
-            rs = stmt.executeQuery();
             
-=======
             stmt.setInt(0, pID);
                 ResultSet rs = stmt.executeQuery();
 
->>>>>>> c7e4e35d804d6d99ac98b9d199c2f1122749ac58
             while (rs.next())
                 l.add(rs.getTimestamp(1));
 
@@ -132,8 +113,7 @@ public class DBReaderImplementation implements IDBReader {
     public User signUp(User pUser) {
         try {
             stmt = con.prepareStatement(signUp);
-<<<<<<< HEAD
-                stmt.setInt(1, count() + 1);
+                stmt.setInt(1, generateID() + 1);
                 stmt.setString(2, pUser.getLogin());
                 stmt.setString(3, pUser.getEmail());
                 stmt.setString(4, pUser.getFullName());
@@ -144,19 +124,7 @@ public class DBReaderImplementation implements IDBReader {
                     (pUser.getPrivilege() == UserPrivilege.ADMIN) ? 1 : 0);
                 
                 stmt.setInt(8,
-=======
-            stmt.setInt(0, generateID());
-            stmt.setString(1, pUser.getLogin());
-            stmt.setString(2, pUser.getEmail());
-            stmt.setString(3, pUser.getFullName());
-            stmt.setString(4, pUser.getPassword());
-            stmt.setTimestamp(5, pUser.getLastPasswordChange());
-            
-            stmt.setInt(6,
-                    (pUser.getPrivilege() == UserPrivilege.ADMIN) ? 1 : 0);
 
-            stmt.setInt(7,
->>>>>>> c7e4e35d804d6d99ac98b9d199c2f1122749ac58
                     (pUser.getStatus() == UserStatus.ENABLED) ? 1 : 0);
 
             stmt.executeUpdate();
@@ -232,7 +200,9 @@ public class DBReaderImplementation implements IDBReader {
     private final String count = 
         "SELECT COUNT(*) FROM user";
 
-<<<<<<< HEAD
+    private final String everyID = 
+        "SELECT id FROM user";
+
     private final String lastSignIns =
         "SELECT lastSignIn FROM signIn WHERE id = ?";
 
@@ -241,17 +211,5 @@ public class DBReaderImplementation implements IDBReader {
 
     private final String signIn =
         "SELECT * FROM user WHERE login = ? AND password = ?";
-=======
-    private final String everyID = 
-        "SELECT ID from user";
 
-    private final String lastSignIns =
-         "SELECT lastSignIn from signIn WHERE id = ?";
-
-    private final String signUp = 
-        "INSERT INTO USER VALUES (?, ?, ?, ?, ?, ?, ?, ?), COUNT(*)";
-
-    private final String signIn = 
-        "SELECT login, password FROM user WHERE login = ? AND password = ?";
->>>>>>> c7e4e35d804d6d99ac98b9d199c2f1122749ac58
 }
