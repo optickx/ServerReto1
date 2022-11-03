@@ -1,90 +1,66 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit5TestClass.java to edit this template
- */
 package logic.model;
 
-import java.sql.Connection;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.sql.Connection;
 
+import logic.model.DBReaderImplementation;
 import logic.objects.User;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import logic.objects.UserPrivilege;
+import logic.objects.UserStatus;
 
 /**
- *
- * @author dani
+ * @author 2dam
  */
 public class DBReaderImplementationTest {
-    
-    public static DBReaderImplementation dbi;
-    
-    @BeforeEach
-    public static void setUpClass() {
-        Connection c = null;
-        try {
-            c = DriverManager
-                .getConnection(
-                "url",
-                "root",
-                "abcd*1234");
-        } catch (SQLException sqle) {
 
-        }
-        
-        dbi =
-            new DBReaderImplementation(c);
-    }
-    
-    @BeforeEach
-    public void setUp() {
+    private static IDBReader idbr;
 
-    }
-    
-    @AfterEach
-    public void tearDown() {
-        
-    }
+    private static User dani, nerea, roke, eneko;
 
-    /**
-     * Test of signIn method, of class DBReaderImplementation.
-     */
     @Test
     public void testSignIn() {
         
-        
     }
 
-    /**
-     * Test of signUp method, of class DBReaderImplementation.
-     */
     @Test
     public void testSignUp() {
-        
-        
-
+        assertNull(idbr.signUp(dani));
     }
 
-    /**
-     * Test of generateID method, of class DBReaderImplementation.
-     */
-    @Test
-    public void testGenerateID() {
-        
+    private void print(Object obj) {
+        System.out.println(obj);
     }
 
-    /**
-     * Test of getConnection method, of class DBReaderImplementation.
-     */
-    @Test
-    public void testGetConnection() {
-        
-        
+    @BeforeClass
+    public static void init() {
+        dani = 
+            new User(0, "opticks", "danielbarrios2002@gmail.com", 
+            "Daniel Barrios Abad", "abcd*1234", null, UserStatus.ENABLED, 
+            UserPrivilege.ADMIN, new ArrayList <Timestamp> ());
+
+        initializeConnection();
     }
-    
+
+    private static void initializeConnection() {
+        Connection pConnection = null;
+
+        try {
+            pConnection = DriverManager
+            .getConnection(
+            "jdbc:mysql://localhost:3306/signApp?serverTimezone=Europe/Madrid&useSSL=false",
+            "root",
+            "abcd*1234");
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+
+        idbr = new DBReaderImplementation(pConnection);
+    }
 }
