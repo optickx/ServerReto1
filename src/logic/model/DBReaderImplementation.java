@@ -106,7 +106,7 @@ public class DBReaderImplementation implements IDBReader {
      * @param user is the user to be written. the attributes CANNOT BE NULL.
      */
     @Override
-    public User signUp(User user) {
+    public User signUp(User user) throws LoginExistsException, EmailExistsException, SQLException {
         try {
             stmt = con.prepareStatement(loginExistsCheck);
             stmt.setString(0, user.getLogin());
@@ -114,7 +114,7 @@ public class DBReaderImplementation implements IDBReader {
             if (rs.next() == false) {
                 throw new LoginExistsException();
             }
-            
+
             stmt = con.prepareStatement(signUp);
             stmt.setInt(0, generateID());
             stmt.setString(1, user.getLogin());
@@ -137,7 +137,7 @@ public class DBReaderImplementation implements IDBReader {
         } catch (LoginExistsException e) {
 
         } catch (EmailExistsException e) {
-            
+
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         }
