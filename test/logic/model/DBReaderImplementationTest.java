@@ -1,5 +1,7 @@
 package logic.model;
 
+import except.EmailExistsException;
+import except.LoginExistsException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -9,6 +11,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.sql.Connection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import logic.model.DBReaderImplementation;
 import logic.objects.User;
@@ -31,7 +35,13 @@ public class DBReaderImplementationTest {
 
     @Test
     public void testSignUp() {
-        assertNull(idbr.signUp(dani));
+        try {
+            assertNull(idbr.signUp(dani));
+        } catch (LoginExistsException ex) {
+            Logger.getLogger(DBReaderImplementationTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (EmailExistsException ex) {
+            Logger.getLogger(DBReaderImplementationTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void print(Object obj) {

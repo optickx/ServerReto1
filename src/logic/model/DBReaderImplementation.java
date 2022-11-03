@@ -1,5 +1,7 @@
 package logic.model;
 
+import except.EmailExistsException;
+import except.LoginExistsException;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ public class DBReaderImplementation implements IDBReader {
      * @param pUser object that contains the credentials.
      * @return a new User with all it's data.
      * if there's nothing found, an empty (null) value.
+     * @throws except.LoginExistsException
+     * @throws except.EmailExistsException
      */
 
     @Override
@@ -75,6 +79,41 @@ public class DBReaderImplementation implements IDBReader {
     }
 
     /**
+     * tells if exists or not obsivus
+     */
+    private boolean loginExists(String pLogin) {
+        try {
+            stmt = con.prepareStatement(checkLogin);
+                stmt.setString(1, pLogin);
+            ResultSet rs = stmt.executeQuery();
+                
+            if (rs.next())
+                return true;
+                
+        } catch (SQLException sqle) {
+            // TODO: handle exception
+        }
+        return false;
+    }
+
+
+    private boolean emailExists(String pEmail) {
+        try {
+            stmt = con.prepareStatement(checkEmail);
+                stmt.setString(1, pEmail);
+            ResultSet rs = stmt.executeQuery();
+                
+            if (rs.next())
+                return true;
+                
+        } catch (SQLException sqle) {
+            // TODO: handle exception
+        }
+        return false;
+    }
+
+
+    /**
      * @param pID is the ID of the user whose logins
      *            will be searched.
      * @return a List of Timestamps, chronologically sorted.
@@ -108,10 +147,18 @@ public class DBReaderImplementation implements IDBReader {
      * 
      * @param pUser is the user to be written.
      * the attributes CANNOT BE NULL.
+     * @throws except.LoginExistsException
+     * @throws except.EmailExistsException
      */
     @Override
-    public User signUp(User pUser) {
+    public User signUp(User pUser) throws LoginExistsException, EmailExistsException {
         try {
+            if (loginExists(pUser.getLogin()))
+                throw new LoginExistsException();
+            
+            if (emailExists(pUser.getEmail()))
+                throw new EmailExistsException();
+        
             stmt = con.prepareStatement(signUp);
                 stmt.setInt(1, generateID() + 1);
                 stmt.setString(2, pUser.getLogin());
@@ -196,6 +243,12 @@ public class DBReaderImplementation implements IDBReader {
 
     // we do not have to create in every module.
     private PreparedStatement stmt;
+
+    private final String checkLogin = 
+        "SELECT login FROM user WHERE login = ?";
+
+    private final String checkEmail =
+        "SELECT email FROM user WHERE email = ?";
 
     private final String count = 
         "SELECT COUNT(*) FROM user";
