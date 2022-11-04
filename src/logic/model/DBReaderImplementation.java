@@ -3,6 +3,7 @@ package logic.model;
 import except.EmailExistsException;
 import except.LoginExistsException;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -81,7 +82,7 @@ public class DBReaderImplementation implements IDBReader {
     /**
      * tells if exists or not obsivus
      */
-    private boolean loginExists(String pLogin) {
+    protected boolean loginExists(String pLogin) {
         try {
             stmt = con.prepareStatement(checkLogin);
                 stmt.setString(1, pLogin);
@@ -97,7 +98,7 @@ public class DBReaderImplementation implements IDBReader {
     }
 
 
-    private boolean emailExists(String pEmail) {
+    protected boolean emailExists(String pEmail) {
         try {
             stmt = con.prepareStatement(checkEmail);
                 stmt.setString(1, pEmail);
@@ -143,13 +144,15 @@ public class DBReaderImplementation implements IDBReader {
     }
 
     /**
-     * method that writes a new User to the database.
-     * 
+     * writes a new User to the database.
      * @param pUser is the user to be written.
      * the attributes CANNOT BE NULL.
+     * @return the same user if everything worked,
+     * and null if they where any errors, plus exception.
      * @throws except.LoginExistsException
      * @throws except.EmailExistsException
      */
+
     @Override
     public User signUp(User pUser) throws LoginExistsException, EmailExistsException {
         try {
@@ -158,14 +161,18 @@ public class DBReaderImplementation implements IDBReader {
             
             if (emailExists(pUser.getEmail()))
                 throw new EmailExistsException();
+
+            int ID = generateID();
+            Timestamp now = 
+                Timestamp.valueOf(LocalDateTime.now());
         
             stmt = con.prepareStatement(signUp);
-                stmt.setInt(1, generateID() + 1);
+                stmt.setInt(1, ID);
                 stmt.setString(2, pUser.getLogin());
                 stmt.setString(3, pUser.getEmail());
                 stmt.setString(4, pUser.getFullName());
                 stmt.setString(5, pUser.getPassword());
-                stmt.setTimestamp(6, pUser.getLastPasswordChange());
+                stmt.setTimestamp(6, now);
                 
                 stmt.setInt(7, 
                     (pUser.getPrivilege() == UserPrivilege.ADMIN) ? 1 : 0);
@@ -176,10 +183,14 @@ public class DBReaderImplementation implements IDBReader {
 
             stmt.executeUpdate();
 
+            //pUser.set
+
             return pUser;
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
         }
         return null;
     }
@@ -193,9 +204,9 @@ public class DBReaderImplementation implements IDBReader {
      * @return a new ID.
      */
     
-    public int generateID() {
+    protected int generateID() {
         List <Integer> l = 
-            new ArrayList<Integer>();
+            new ArrayList <Integer>();
 
         try {
 
@@ -210,7 +221,7 @@ public class DBReaderImplementation implements IDBReader {
                     .executeQuery();
 
             while (rs.next())
-                l.add(rs.getInt(0));
+                l.add(rs.getInt(1));
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
