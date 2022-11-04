@@ -22,7 +22,7 @@ public class Controller {
                 if (contadorThreads > 10) {
                     throw new ServerCapacityException();
                 }
-                miServidor = new ServerSocket(7777);
+                miServidor = new ServerSocket(4545);
                 socket = miServidor.accept();
                 createRunThread(socket);
             }

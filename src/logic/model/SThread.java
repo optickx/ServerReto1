@@ -8,6 +8,7 @@ package logic.model;
 import except.EmailExistsException;
 import except.LoginCredentialException;
 import except.LoginExistsException;
+import except.NotRegisteredException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -59,12 +60,14 @@ public class SThread extends Thread {
             //Mandas los datos al cliente con todo correcto
             response = new Response(user, ResponseType.OK);
 
-        }  catch (EmailExistsException e) {
+        } catch (EmailExistsException e) {
             response = new Response(null, ResponseType.EMAIL_EXISTS_ERROR);
         } catch (LoginExistsException e) {
             response = new Response(null, ResponseType.LOGIN_EXISTS_ERROR);
+        } catch (NotRegisteredException e) {
+            response = new Response(null, ResponseType.NOT_REGISTERED_ERROR);
         } catch (Exception e) {
-            response = new Response(null, ResponseType.OK);
+            e.printStackTrace();//response = new Response(null, ResponseType.OK);
         } finally {
             try {
                 write.writeObject(response);
