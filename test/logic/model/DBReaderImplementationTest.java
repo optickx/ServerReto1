@@ -8,52 +8,91 @@ import static org.junit.Assert.*;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.sql.Connection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import logic.model.DBReaderImplementation;
 import logic.objects.User;
-import logic.objects.UserPrivilege;
-import logic.objects.UserStatus;
 
 /**
- * @author 2dam
+ * @author dani
  */
 public class DBReaderImplementationTest {
 
-    private static IDBReader idbr;
+    private static DBReaderImplementation idbr;
 
-    private static User dani, nerea, roke, eneko;
+    private static List <User> team = 
+        SampleUsers.teamUsers();
+
+    private static List <User> random =
+        SampleUsers.randomUsers();
 
     @Test
     public void testSignIn() {
         
+
+
     }
 
     @Test
     public void testSignUp() {
-        try {
-            assertNull(idbr.signUp(dani));
-        } catch (LoginExistsException ex) {
-            Logger.getLogger(DBReaderImplementationTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (EmailExistsException ex) {
-            Logger.getLogger(DBReaderImplementationTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        /*
+        users from the team that
+        are already at the database.
+        */ 
+
+        List <User> already =
+            new ArrayList <User> ();
+
+        for (int i = 0; i < team.size()/2; i++)
+            try {
+                assertNotNull(idbr.signUp(team.get(i)));   
+            } catch (EmailExistsException eee) {
+                System.out.println("Impossible case.");
+            } catch (LoginExistsException lee) {
+                System.out.println("Impossible case.");
+            }
+        
+        // now we save half of the values that are not in the table.
+
+        team.forEach(u -> {
+            if (idbr.signIn(u) != null)
+                already.add(u);
+            });
+
+        already.forEach(u -> {
+            try {
+                idbr.signUp(u);   
+            } catch (EmailExistsException eee) {
+                assertEquals(u.getEmail(), idbr.signIn(u).getEmail());
+                assertTrue(already.contains(u));
+            } catch (LoginExistsException lee) {
+                assertEquals(u.getLogin(), idbr.signIn(u).getLogin());
+                assertTrue(already.contains(u));
+            }
+        }); 
+
+        random.forEach(u -> {
+            try {
+                idbr.signUp(u);
+            } catch (EmailExistsException eee) {
+                System.out.println("Impossible case.");
+            } catch (LoginExistsException lee) {
+                System.out.println("Impossible case");
+            }
+        });
     }
 
-    private void print(Object obj) {
-        System.out.println(obj);
+    @Test
+    public void testGenerateID() {
+        System.out.println(idbr.generateID());
     }
 
     @BeforeClass
     public static void init() {
-        dani = 
-            new User(0, "opticks", "danielbarrios2002@gmail.com", 
-            "Daniel Barrios Abad", "abcd*1234", null, UserStatus.ENABLED, 
-            UserPrivilege.ADMIN, new ArrayList <Timestamp> ());
+        
 
         initializeConnection();
     }
