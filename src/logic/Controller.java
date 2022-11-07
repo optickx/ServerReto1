@@ -18,11 +18,12 @@ public class Controller {
         Socket socket = null;
 
         try {
+            miServidor = new ServerSocket(9107);
             for (;;) {
                 if (contadorThreads > 10) {
                     throw new ServerCapacityException();
                 }
-                miServidor = new ServerSocket(4545);
+
                 socket = miServidor.accept();
                 createRunThread(socket);
             }

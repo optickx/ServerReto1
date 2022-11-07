@@ -66,8 +66,10 @@ public class SThread extends Thread {
             response = new Response(null, ResponseType.LOGIN_EXISTS_ERROR);
         } catch (NotRegisteredException e) {
             response = new Response(null, ResponseType.NOT_REGISTERED_ERROR);
+        } catch (LoginCredentialException e) {
+            response = new Response(null, ResponseType.LOGIN_CREDENTIAL_ERROR);
         } catch (Exception e) {
-            e.printStackTrace();//response = new Response(null, ResponseType.OK);
+            e.printStackTrace();
         } finally {
             try {
                 write.writeObject(response);
