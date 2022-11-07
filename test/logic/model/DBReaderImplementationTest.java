@@ -55,8 +55,10 @@ public class DBReaderImplementationTest {
     @Test
     @Order(order = 1)
     public void testSignIn() {
-        randomLogged.forEach(u -> 
-            assertNotNull(idbr.signIn(u)));
+        randomLogged.forEach(u -> {
+            assertNotNull(idbr.signIn(u));
+            System.out.println(idbr.signIn(u).toString());
+        });
 
         randomNotLogged.forEach(u -> 
             assertNull(idbr.signIn(u)));
