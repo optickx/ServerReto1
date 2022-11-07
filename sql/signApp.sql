@@ -57,7 +57,7 @@ CREATE TABLE `user` (
   `userStatus` int(2) DEFAULT NULL,
   `privilege` int(2) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `login` (`login`)
+  UNIQUE KEY (`login`, `email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
