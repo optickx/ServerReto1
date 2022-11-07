@@ -12,8 +12,7 @@ public abstract class DBReaderFactory {
     public static IDBReader getAccess() {
         if (idbr == null) {
             Pool pool = new Pool();
-            idbr
-                    = new DBReaderImplementation(pool.getConnection());
+            idbr= new DBReaderImplementation(pool.getConnection());
         }
 
         return idbr;
