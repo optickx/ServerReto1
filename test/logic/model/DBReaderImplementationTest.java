@@ -1,6 +1,7 @@
 package logic.model;
 
 import except.EmailExistsException;
+import except.LoginCredentialException;
 import except.LoginExistsException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -56,12 +57,23 @@ public class DBReaderImplementationTest {
     @Order(order = 1)
     public void testSignIn() {
         randomLogged.forEach(u -> {
-            assertNotNull(idbr.signIn(u));
-            System.out.println(idbr.signIn(u).toString());
+            try {
+                assertNotNull(idbr.signIn(u));
+                System.out.println(idbr.signIn(u).toString());
+                System.out.println(idbr.signIn(u).toString());
+            } catch (LoginCredentialException lce) {
+                // TODO: handle exception
+            }
         });
 
-        randomNotLogged.forEach(u -> 
-            assertNull(idbr.signIn(u)));
+        randomNotLogged.forEach(u -> {
+            try {
+                assertNull(idbr.signIn(u));
+            } catch (LoginCredentialException lce) {
+                // TODO: handle exception
+            }
+        });
+            
     }
 
     @Test

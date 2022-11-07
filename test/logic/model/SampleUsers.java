@@ -22,6 +22,8 @@ public abstract class SampleUsers {
 
         Collections.shuffle(l);
 
+        //l.forEach(u -> System.out.println(u));
+
         return l;
     }
 
@@ -101,5 +103,9 @@ public abstract class SampleUsers {
             c[i] = (char) (int) ((Math.random() * (a - b)) + b);
 
         return c;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(randomUser().toString());
     }
 }

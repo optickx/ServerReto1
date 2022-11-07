@@ -83,13 +83,11 @@ public class DBReaderImplementation implements IDBReader {
     @Override
     public User signUp(User pUser) throws LoginExistsException, EmailExistsException {
         try {
-            if (loginExists(pUser.getLogin())) {
+            if (loginExists(pUser.getLogin()))
                 throw new LoginExistsException();
-            }
 
-            if (emailExists(pUser.getEmail())) {
+            if (emailExists(pUser.getEmail()))
                 throw new EmailExistsException();
-            }
 
             int ID = generateID();
 
