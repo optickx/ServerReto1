@@ -78,10 +78,10 @@ public class DBReaderImplementation implements IDBReader {
 
 
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            //sqle.printStackTrace();
         } catch (NullPointerException npe) {
             // this should never happen.
-            npe.printStackTrace();
+            //npe.printStackTrace();
         }
 
         return null;
@@ -136,9 +136,9 @@ public class DBReaderImplementation implements IDBReader {
             return pUser;
 
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            //sqle.printStackTrace();
         } catch (NullPointerException npe) {
-            npe.printStackTrace();
+            //npe.printStackTrace();
         }
         return null;
     }
@@ -198,7 +198,7 @@ public class DBReaderImplementation implements IDBReader {
                 l.add(rs.getTimestamp(1));
 
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            //sqle.printStackTrace();
         }
 
         l.stream()
@@ -215,7 +215,7 @@ public class DBReaderImplementation implements IDBReader {
                 stmt.executeUpdate();
 
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            //sqle.printStackTrace();
             return false;
         }
         return true;
@@ -250,7 +250,7 @@ public class DBReaderImplementation implements IDBReader {
                 l.add(rs.getInt(1));
 
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            //sqle.printStackTrace();
         }
 
         if (l.isEmpty())

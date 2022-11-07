@@ -17,7 +17,7 @@ public abstract class SampleUsers {
         List <User> l = 
             new ArrayList <> ();
         
-        for (int i = 0; i < 10; i++) 
+        for (int i = 0; i < 20; i++) 
             l.add(randomUser());
 
         Collections.shuffle(l);
