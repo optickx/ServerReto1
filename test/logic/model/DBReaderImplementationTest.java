@@ -1,6 +1,7 @@
 package logic.model;
 
 import except.EmailExistsException;
+import except.LoginCredentialException;
 import except.LoginExistsException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -18,16 +19,25 @@ import logic.objects.User;
 /**
  * @author dani
  */
+
 @RunWith(OrderedRunner.class)
 public class DBReaderImplementationTest {
 
     private static DBReaderImplementation idbr;
+
+    // lists to store randomly generated users
 
     private static final List<User> 
         randomLogged = 
             SampleUsers.randomUsers(),
         randomNotLogged = 
             SampleUsers.randomUsers();
+
+
+    /**
+     * registers all the user in randomLogged collection.
+     * then checks that every User has been properly written.
+     */
 
     @Test
     @Order(order = 0)
@@ -52,16 +62,31 @@ public class DBReaderImplementationTest {
         });
     }
 
+    /**
+     * checks, once again that every user has been checked,
+     * and also that every 
+     */
+
     @Test
     @Order(order = 1)
     public void testSignIn() {
         randomLogged.forEach(u -> {
-            assertNotNull(idbr.signIn(u));
-            System.out.println(idbr.signIn(u).toString());
+            try {
+                assertNotNull(idbr.signIn(u));
+            } catch (LoginCredentialException lce) {
+                lce.printStackTrace(); // impossible
+                // TODO: handle exception
+
+            }
         });
 
-        randomNotLogged.forEach(u -> 
-            assertNull(idbr.signIn(u)));
+        randomNotLogged.forEach(u -> {
+            try {
+                assertNull(idbr.signIn(u));
+            } catch (LoginCredentialException lce) {
+                // TODO: handle exception
+            }
+        });     
     }
 
     @Test
