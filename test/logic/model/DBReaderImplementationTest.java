@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
-import java.sql.Connection;
+import java.util.ResourceBundle;
 
 import logic.objects.User;
 
@@ -29,10 +29,9 @@ public class DBReaderImplementationTest {
 
     private static final List<User> 
         randomLogged = 
-            SampleUsers.randomUsers(),
+            SampleUsers.randomUsers(2),
         randomNotLogged = 
-            SampleUsers.randomUsers();
-
+            SampleUsers.randomUsers(1);
 
     /**
      * registers all the user in randomLogged collection.
@@ -76,7 +75,6 @@ public class DBReaderImplementationTest {
             } catch (LoginCredentialException lce) {
                 lce.printStackTrace(); // impossible
                 // TODO: handle exception
-
             }
         });
 
@@ -108,18 +106,20 @@ public class DBReaderImplementationTest {
 
     @BeforeClass
     public static void init() {
-        Connection pConnection = null;
+        ResourceBundle rb = 
+            ResourceBundle
+                .getBundle("resources.database_access");
 
         try {
-            pConnection = DriverManager
-                    .getConnection(
-                            "jdbc:mysql://localhost:3306/signApp?serverTimezone=Europe/Madrid&useSSL=false",
-                            "root",
-                            "abcd*1234");
+            idbr = 
+                new DBReaderImplementation(
+                    DriverManager
+                        .getConnection(
+                            rb.getString("URL"),
+                            rb.getString("USER"),
+                            rb.getString("PASSWORD")));
         } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }
-
-        idbr = new DBReaderImplementation(pConnection);
+        }   
     }
 }

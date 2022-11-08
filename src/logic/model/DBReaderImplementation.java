@@ -38,6 +38,7 @@ public class DBReaderImplementation implements IDBReader {
      * (null) value.
      * @throws except.LoginCredentialException
      */
+
     @Override
     public User signIn(User user) throws LoginCredentialException {
         try {
@@ -45,26 +46,32 @@ public class DBReaderImplementation implements IDBReader {
             stmt.setString(1, user.getLogin());
             stmt.setString(2, user.getPassword());
             ResultSet rs = stmt.executeQuery();
+
             /**
              * the values of the last SignIns are obtained by using the ID to
              * seach it.
              */
-            int ID
-                    = rs.getInt("id");
+
+            int ID = 0;
+
+            if (rs.next()) 
+                ID = 
+                    rs.getInt("id");
+            else 
+                throw new LoginCredentialException();
 
             insertSignIn(ID, rightNow());
-
-            user = new User(
-                    ID,
-                    rs.getString("email"),
-                    rs.getString("fullName"),
-                    rs.getString(4),
-                    rs.getString(5),
-                    rs.getTimestamp(6),
-                    rs.getInt(7),
-                    rs.getInt(8),
-                    selectLastLogins(ID));
-
+        
+            user = new User(ID,
+                rs.getString("email"),
+                rs.getString("fullName"),
+                rs.getString(4),
+                rs.getString(5),
+                rs.getTimestamp(6),
+                rs.getInt(7),
+                rs.getInt(8),
+                selectLastLogins(ID));
+                
         } catch (SQLException sqle) {
             throw new LoginCredentialException();
         }
@@ -80,16 +87,15 @@ public class DBReaderImplementation implements IDBReader {
      * @throws except.LoginExistsException
      * @throws except.EmailExistsException
      */
+    
     @Override
     public User signUp(User pUser) throws LoginExistsException, EmailExistsException {
         try {
-            if (loginExists(pUser.getLogin())) {
+            if (loginExists(pUser.getLogin()))
                 throw new LoginExistsException();
-            }
 
-            if (emailExists(pUser.getEmail())) {
+            if (emailExists(pUser.getEmail())) 
                 throw new EmailExistsException();
-            }
 
             int ID = generateID();
 
@@ -102,21 +108,24 @@ public class DBReaderImplementation implements IDBReader {
             stmt.setTimestamp(6, rightNow());
 
             stmt.setInt(7,
-                    (pUser.getPrivilege() == UserPrivilege.ADMIN) ? 1 : 0);
+                (pUser.getPrivilege() == UserPrivilege.ADMIN) ? 1 : 0);
 
             stmt.setInt(8,
-                    (pUser.getStatus() == UserStatus.ENABLED) ? 1 : 0);
+                (pUser.getStatus() == UserStatus.ENABLED) ? 1 : 0);
 
             stmt.executeUpdate();
 
             pUser.setID(ID);
+            
+            List <Timestamp> l = 
+                pUser.getLastLogins();
 
-            if (!pUser.getLastLogins().isEmpty()) {
-                pUser.getLastLogins().forEach(l
-                        -> insertSignIn(ID, l));
-            }
+            if (l.size() == 10)
+                l.remove(0);
 
-            insertSignIn(ID, rightNow());
+            l.add(rightNow());
+            
+            l.forEach(t -> insertSignIn(ID, t));
 
             return pUser;
 
@@ -134,9 +143,9 @@ public class DBReaderImplementation implements IDBReader {
             stmt.setString(1, pEmail);
             ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
+            if (rs.next())
                 return true;
-            }
+            
 
         } catch (SQLException sqle) {
             // TODO: handle exception
@@ -153,9 +162,9 @@ public class DBReaderImplementation implements IDBReader {
             stmt.setString(1, pLogin);
             ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
+            if (rs.next()) 
                 return true;
-            }
+            
 
         } catch (SQLException sqle) {
             // TODO: handle exception
@@ -193,13 +202,13 @@ public class DBReaderImplementation implements IDBReader {
 
     private boolean insertSignIn(int pID, Timestamp pSignIn) {
         try {
-            stmt = con.prepareStatement(insertSignIn);
-            stmt.setTimestamp(1, pSignIn);
-            stmt.setInt(2, pID);
-            stmt.executeUpdate();
+            PreparedStatement pstmt =
+                con.prepareStatement(insertSignIn);
+            pstmt.setTimestamp(1, pSignIn);
+            pstmt.setInt(2, pID);
+                pstmt.executeUpdate();
 
         } catch (SQLException sqle) {
-            //sqle.printStackTrace();
             return false;
         }
         return true;
