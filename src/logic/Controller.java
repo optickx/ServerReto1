@@ -55,8 +55,6 @@ public class Controller {
             salida.close();
             entrada.close();
             contadorThreads--;
-        } catch (IOException | ClassNotFoundException ex) {
-        }
-
+        } catch (IOException | ClassNotFoundException ex) {}
     }
 }

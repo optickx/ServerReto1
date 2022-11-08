@@ -55,7 +55,6 @@ public class SThread extends Thread {
             }
             if (request.getRequestType().equals(RequestType.SIGNUP)) {
                 user = dbReader.signUp(request.getUser());
-
             }
             //Mandas los datos al cliente con todo correcto
             response = new Response(user, ResponseType.OK);

@@ -13,11 +13,11 @@ import logic.objects.UserStatus;
 
 public abstract class SampleUsers {
 
-    public static List <User> randomUsers() {
+    public static List <User> randomUsers(int n) {
         List <User> l = 
             new ArrayList <> ();
         
-        for (int i = 0; i < 20; i++) 
+        for (int i = 0; i < n; i++) 
             l.add(randomUser());
 
         Collections.shuffle(l);
@@ -45,7 +45,7 @@ public abstract class SampleUsers {
         List <Timestamp> l = 
             new ArrayList <Timestamp> ();
 
-        for (int i = 0; i < 10; i++) 
+        for (int i = 0; i < 3; i++) 
             l.add(getRandomDate());
 
         return l;
@@ -90,8 +90,8 @@ public abstract class SampleUsers {
             String.valueOf(randomChars(33, 122)) + "@gmail.com",
             String.valueOf(randomChars(33, 122)),
             String.valueOf(randomChars(33, 122)),
-            getRandomDate(), (int) Math.random() * 2,
-            (int) Math.random() * 2, randomDates());
+            getRandomDate(), (int) (Math.random() * 2),
+            (int) (Math.random() * 2), randomDates());
     }
 
     private static char [] randomChars(int a, int b) {
