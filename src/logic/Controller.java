@@ -8,27 +8,33 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import logic.model.SThread;
 import logic.objects.message.Response;
+import logic.objects.message.types.ResponseType;
 
 public class Controller {
 
-    private int contadorThreads = 0;
+    private static int contadorThreads = 0;
 
-    public synchronized void run() throws IOException {
+    public void run() throws ServerCapacityException, IOException {
         ServerSocket miServidor = null;
         Socket socket = null;
+        miServidor = new ServerSocket(9107);
+        for (;;) {
+            contadorHilos(contadorThreads, socket);
+            socket = miServidor.accept();
+            createRunThread(socket);
+        }
+    }
 
-        try {
-            miServidor = new ServerSocket(9107);
-            for (;;) {
-                if (contadorThreads > 10) {
-                    throw new ServerCapacityException();
-                }
+    public synchronized void contadorHilos(int cont, Socket socket) throws ServerCapacityException {
+        if (contadorThreads > 10) {
+            try {
+                Response response = new Response(null, ResponseType.SERVER_CAPACITY_ERROR);
+                ObjectOutputStream write = new ObjectOutputStream(socket.getOutputStream());
+                write.writeObject(response);
+                //throw new ServerCapacityException();  
+            } catch (IOException e) {
 
-                socket = miServidor.accept();
-                createRunThread(socket);
             }
-        } catch (ServerCapacityException e) {
-            //salida = new ObjectOutputStream(socket.getOutputStream());
         }
     }
 
@@ -43,20 +49,7 @@ public class Controller {
 
     }
 
-    public void closeThread(Socket socket) {
-        try {
-            //Leemos lo que nos ha mandado el hilo
-            ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
-            Response response = (Response) entrada.readObject();
-            //Escribimos la respuesta para mandarselo al cliente
-            ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
-            salida.writeObject(response);
-            //Cerrar flujos
-            salida.close();
-            entrada.close();
-            contadorThreads--;
-        } catch (IOException | ClassNotFoundException ex) {
-        }
-
+    public static void closeThread() {
+        contadorThreads--;
     }
 }

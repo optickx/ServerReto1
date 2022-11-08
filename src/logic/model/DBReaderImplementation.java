@@ -49,15 +49,25 @@ public class DBReaderImplementation implements IDBReader {
              * the values of the last SignIns are obtained by using the ID to
              * seach it.
              */
-
-            int ID = rs.getInt("id");
-
-            System.out.println(ID);
-            insertSignIn(ID, rightNow());
-
+            if(rs.next()){
+                int ID = rs.getInt("id");
+                insertSignIn(ID, rightNow());
+                user = new User(
+                    ID,
+                    rs.getString(2),
+                    rs.getString(3),
+                    rs.getString(4),
+                    rs.getString(5),
+                    rs.getTimestamp(6),
+                    rs.getInt(7),
+                    rs.getInt(8),
+                    selectLastLogins(ID));
+            }
+            else{
+                throw new LoginCredentialException();
+            }
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
-            //throw new LoginCredentialException();
+            throw new LoginCredentialException();
         }
         return user;
     }
@@ -275,7 +285,7 @@ public class DBReaderImplementation implements IDBReader {
             = "INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     private final String signIn
-            = "SELECT id,email,fullName,lastPasswordChange,userStatus,privilege FROM USER WHERE LOGIN= ? AND PASSWORD= ?";
+            = "SELECT * FROM USER WHERE LOGIN= ? AND PASSWORD= ?";
 //"SELECT * FROM USER WHERE LOGIN=? AND PASSWORD=?";
 
     private final String insertSignIn
