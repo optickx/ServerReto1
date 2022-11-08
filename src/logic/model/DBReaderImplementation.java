@@ -49,24 +49,15 @@ public class DBReaderImplementation implements IDBReader {
              * the values of the last SignIns are obtained by using the ID to
              * seach it.
              */
-            int ID
-                    = rs.getInt("id");
 
+            int ID = rs.getInt("id");
+
+            System.out.println(ID);
             insertSignIn(ID, rightNow());
 
-            user = new User(
-                    ID,
-                    rs.getString("email"),
-                    rs.getString("fullName"),
-                    rs.getString(4),
-                    rs.getString(5),
-                    rs.getTimestamp(6),
-                    rs.getInt(7),
-                    rs.getInt(8),
-                    selectLastLogins(ID));
-
         } catch (SQLException sqle) {
-            throw new LoginCredentialException();
+            sqle.printStackTrace();
+            //throw new LoginCredentialException();
         }
         return user;
     }
@@ -83,11 +74,13 @@ public class DBReaderImplementation implements IDBReader {
     @Override
     public User signUp(User pUser) throws LoginExistsException, EmailExistsException {
         try {
-            if (loginExists(pUser.getLogin()))
+            if (loginExists(pUser.getLogin())) {
                 throw new LoginExistsException();
+            }
 
-            if (emailExists(pUser.getEmail()))
+            if (emailExists(pUser.getEmail())) {
                 throw new EmailExistsException();
+            }
 
             int ID = generateID();
 
@@ -282,7 +275,8 @@ public class DBReaderImplementation implements IDBReader {
             = "INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     private final String signIn
-            = "SELECT * FROM user WHERE login = ? AND password = ?";
+            = "SELECT id,email,fullName,lastPasswordChange,userStatus,privilege FROM USER WHERE LOGIN= ? AND PASSWORD= ?";
+//"SELECT * FROM USER WHERE LOGIN=? AND PASSWORD=?";
 
     private final String insertSignIn
             = "INSERT INTO signIn VALUES (?, ?)";
