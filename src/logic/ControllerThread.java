@@ -10,7 +10,7 @@ import logic.model.SThread;
 import logic.objects.message.Response;
 import logic.objects.message.types.ResponseType;
 
-public class Controller {
+public class ControllerThread {
 
     private static int contadorThreads = 0;
 

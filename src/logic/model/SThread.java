@@ -18,7 +18,7 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import logic.Controller;
+import logic.ControllerThread;
 import logic.DBReaderFactory;
 import logic.objects.User;
 import logic.objects.message.Request;
@@ -76,9 +76,10 @@ public class SThread extends Thread {
                 write.writeObject(response);
                 write.close();
                 read.close();
+                ControllerThread.closeThread();
                 //Probar que se pueden conectar varios a la vez
-                // wait(50000000);
-                Controller.closeThread();
+                //wait(50000000);
+
             } catch (IOException ex) {
                 //Logger.getLogger(SThread.class.getName()).log(Level.SEVERE, null, ex);
             }/* catch (InterruptedException ex) {
