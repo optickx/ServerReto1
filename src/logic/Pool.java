@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Pool {
+
     private static Stack stack = new Stack();
     private Connection con;
     private final ResourceBundle config
@@ -35,7 +36,7 @@ public class Pool {
         try {
             con.close();
         } catch (SQLException ex) {
-           Logger.getLogger(Pool.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Pool.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -51,7 +52,7 @@ public class Pool {
         stack.push(con);
     }
 
-    public void removeAll() {
+    public static void removeAll() {
         stack.clear();
     }
 

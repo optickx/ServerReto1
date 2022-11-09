@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import logic.model.ExitThread;
 import logic.model.SThread;
 import logic.objects.message.Response;
 import logic.objects.message.types.ResponseType;
@@ -18,6 +19,7 @@ public class ControllerThread {
         ServerSocket miServidor = null;
         Socket socket = null;
         miServidor = new ServerSocket(9107);
+        createExitThread();
         for (;;) {
             contadorHilos(contadorThreads, socket);
             socket = miServidor.accept();
@@ -51,5 +53,10 @@ public class ControllerThread {
 
     public static void closeThread() {
         contadorThreads--;
+    }
+
+    private void createExitThread() {
+        ExitThread thread = new ExitThread();
+        thread.start();
     }
 }
