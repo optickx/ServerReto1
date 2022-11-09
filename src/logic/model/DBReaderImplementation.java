@@ -62,7 +62,7 @@ public class DBReaderImplementation implements IDBReader {
 
             insertSignIn(ID, rightNow());
         
-            user = new User(ID,
+            return new User(ID,
                 rs.getString("email"),
                 rs.getString("fullName"),
                 rs.getString(4),
@@ -75,7 +75,6 @@ public class DBReaderImplementation implements IDBReader {
         } catch (SQLException sqle) {
             throw new LoginCredentialException();
         }
-        return user;
     }
 
     /**
@@ -91,12 +90,12 @@ public class DBReaderImplementation implements IDBReader {
     @Override
     public User signUp(User pUser) throws LoginExistsException, EmailExistsException {
         try {
-            if (loginExists(pUser.getLogin()))
-                throw new LoginExistsException();
+            if (loginExists(pUser.getLogin())) 
+                throw new LoginExistsException();                
 
-            if (emailExists(pUser.getEmail())) 
+            else if (emailExists(pUser.getEmail())) 
                 throw new EmailExistsException();
-
+            
             int ID = generateID();
 
             stmt = con.prepareStatement(signUp);
@@ -114,8 +113,6 @@ public class DBReaderImplementation implements IDBReader {
                 (pUser.getStatus() == UserStatus.ENABLED) ? 1 : 0);
 
             stmt.executeUpdate();
-
-            pUser.setID(ID);
             
             List <Timestamp> l = 
                 pUser.getLastLogins();
@@ -127,12 +124,14 @@ public class DBReaderImplementation implements IDBReader {
             
             l.forEach(t -> insertSignIn(ID, t));
 
+            pUser.setLastLogins(l);
+
             return pUser;
 
         } catch (SQLException sqle) {
-            //sqle.printStackTrace();
+            // sqle.printStackTrace();
         } catch (NullPointerException npe) {
-            //npe.printStackTrace();
+            // npe.printStackTrace();
         }
         return null;
     }
@@ -141,14 +140,12 @@ public class DBReaderImplementation implements IDBReader {
         try {
             stmt = con.prepareStatement(checkEmail);
             stmt.setString(1, pEmail);
-            ResultSet rs = stmt.executeQuery();
 
-            if (rs.next())
+            if (stmt.executeQuery().next())
                 return true;
             
-
         } catch (SQLException sqle) {
-            // TODO: handle exception
+            // TODO: what the fuck, seriously, what the fuck
         }
         return false;
     }
@@ -156,18 +153,17 @@ public class DBReaderImplementation implements IDBReader {
     /**
      * tells if exists or not obsivus
      */
+
     protected boolean loginExists(String pLogin) {
         try {
             stmt = con.prepareStatement(checkLogin);
             stmt.setString(1, pLogin);
-            ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) 
+            if (stmt.executeQuery().next()) 
                 return true;
-            
 
         } catch (SQLException sqle) {
-            // TODO: handle exception
+            sqle.printStackTrace();
         }
         return false;
     }
@@ -221,7 +217,7 @@ public class DBReaderImplementation implements IDBReader {
      * @return a new ID.
      */
     protected int generateID() {
-        List<Integer> l
+        List <Integer> l
                 = new ArrayList<Integer>();
 
         try {
@@ -231,6 +227,7 @@ public class DBReaderImplementation implements IDBReader {
              * would modify the prepared statement from the function calling
              * this code and this could give errors.
              */
+
             ResultSet rs = con.prepareStatement(everyID)
                     .executeQuery();
 
@@ -242,18 +239,20 @@ public class DBReaderImplementation implements IDBReader {
             //sqle.printStackTrace();
         }
 
-        if (l.isEmpty()) {
-            return 1;
-        } else if (l.contains(l.size())) {
-            return l.size() + 1;
+        int i = 1;
+
+        if (l.isEmpty()) 
+            return i;
+
+        else if (l.contains(l.size())) {
+            while (l.contains(i)) 
+                i++;
+            return i;
         }
-
-        /**
-         * in case of not having a "perfect" case of IDs, we give the new one.
-         */
+        //in case of not having a "perfect" case of IDs, we give the new one.
+         
         return l.stream()
-                .max((i1, i2) -> i1 - i2).get() + 1;
-
+            .max((i1, i2) -> i1 - i2).get() + 1;
     }
 
     /**
@@ -276,10 +275,10 @@ public class DBReaderImplementation implements IDBReader {
     private PreparedStatement stmt;
 
     private final String checkLogin
-            = "SELECT login FROM user WHERE login = ?";
+            = "SELECT * FROM user WHERE login = ?";
 
     private final String checkEmail
-            = "SELECT email FROM user WHERE email = ?";
+            = "SELECT * FROM user WHERE email = ?";
 
     //private final String count = 
     //    "SELECT COUNT(*) FROM user";
@@ -297,5 +296,7 @@ public class DBReaderImplementation implements IDBReader {
 
     private final String insertSignIn
             = "INSERT INTO signIn VALUES (?, ?)";
+
+    public final String tableName = "user";
 
 }

@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -29,9 +30,9 @@ public class DBReaderImplementationTest {
 
     private static final List<User> 
         randomLogged = 
-            SampleUsers.randomUsers(2),
+            SampleUsers.randomUsers(20),
         randomNotLogged = 
-            SampleUsers.randomUsers(1);
+            SampleUsers.randomUsers(20);
 
     /**
      * registers all the user in randomLogged collection.
@@ -44,7 +45,7 @@ public class DBReaderImplementationTest {
 
         randomLogged.forEach(u -> {
             try {
-                assertNotNull(idbr.signUp(u));
+                assertEquals(u, idbr.signUp(u));
             } catch (LoginExistsException lee) {
                 lee.printStackTrace(); // impossible case
             } catch (EmailExistsException eee) {
@@ -56,7 +57,10 @@ public class DBReaderImplementationTest {
             try {
                 assertNull(idbr.signUp(u));
             } catch (Exception e) {
-                System.out.println("As expected.");
+                // we should end in here.
+                assertTrue(
+                    e instanceof LoginExistsException ||
+                    e instanceof EmailExistsException);
             }
         });
     }
@@ -73,8 +77,7 @@ public class DBReaderImplementationTest {
             try {
                 assertNotNull(idbr.signIn(u));
             } catch (LoginCredentialException lce) {
-                lce.printStackTrace(); // impossible
-                // TODO: handle exception
+                //lce.printStackTrace(); // impossible
             }
         });
 
@@ -82,34 +85,40 @@ public class DBReaderImplementationTest {
             try {
                 assertNull(idbr.signIn(u));
             } catch (LoginCredentialException lce) {
-                // TODO: handle exception
+                // 
             }
         });     
     }
 
+    /**
+     * checks that the IDs are generated correctly.
+     */
+
     @Test
     @Order(order = 2)
     public void testGenerateID() {
-        int assID = -1;
-        if (!randomLogged.isEmpty())
-            assID = randomLogged.stream()
-                .max((u1, u2) -> 
-                    u1.getID() - u2.getID())
-                        .get().getID() + 1;
-
-        if (assID != -1)
-            assertEquals(assID, idbr.generateID());
-
-        assertNotEquals(assID, -1);
-        
+        // maximum possible ID.
+        int total = 0;
+        try {
+            ResultSet rs =  idbr
+                .getConnection()
+                    .prepareStatement("SELECT COUNT(*) FROM" + idbr.tableName)
+                        .executeQuery();
+            total = rs.getInt(1);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
     }
 
+    /**
+     * executed before any test, loads the connection
+     * so that we can access the database.
+     */
     @BeforeClass
     public static void init() {
         ResourceBundle rb = 
             ResourceBundle
                 .getBundle("resources.database_access");
-
         try {
             idbr = 
                 new DBReaderImplementation(
