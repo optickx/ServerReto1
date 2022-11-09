@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `signin`;
 CREATE TABLE `signin` (
   `lastSignIn` timestamp NOT NULL,
   `id` int(11) NOT NULL,
-  PRIMARY KEY (`lastSignIn`,`id`) USING BTREE,
+  PRIMARY KEY (`id`) USING BTREE,
   KEY `id` (`id`),
   CONSTRAINT `id` FOREIGN KEY (`id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
