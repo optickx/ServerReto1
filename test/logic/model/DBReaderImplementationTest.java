@@ -12,38 +12,31 @@ import static org.junit.Assert.*;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.sql.Connection;
 
 import logic.objects.User;
 
 /**
  * @author dani
  */
-
 @RunWith(OrderedRunner.class)
 public class DBReaderImplementationTest {
 
     private static DBReaderImplementation idbr;
 
-    // lists to store randomly generated users
-
     private static final List<User> 
         randomLogged = 
-            UserGenerator.randomUsers(25),
+            SampleUsers.randomUsers(),
         randomNotLogged = 
-            UserGenerator.randomUsers(20);
-
-    /**
-     * registers all the user in randomLogged collection.
-     * then checks that every User has been properly written.
-     */
+            SampleUsers.randomUsers();
 
     @Test
     @Order(order = 0)
     public void testSignUp() {
+
         randomLogged.forEach(u -> {
             try {
-                assertEquals(u, idbr.signUp(u));
+                assertNotNull(idbr.signUp(u));
             } catch (LoginExistsException lee) {
                 lee.printStackTrace(); // impossible case
             } catch (EmailExistsException eee) {
@@ -55,18 +48,10 @@ public class DBReaderImplementationTest {
             try {
                 assertNull(idbr.signUp(u));
             } catch (Exception e) {
-                // we should end in here.
-                assertTrue(
-                    e instanceof LoginExistsException ||
-                    e instanceof EmailExistsException);
+                System.out.println("As expected.");
             }
         });
     }
-
-    /**
-     * checks, once again that every user has been checked,
-     * and also that every 
-     */
 
     @Test
     @Order(order = 1)
@@ -74,8 +59,10 @@ public class DBReaderImplementationTest {
         randomLogged.forEach(u -> {
             try {
                 assertNotNull(idbr.signIn(u));
+                System.out.println(idbr.signIn(u).toString());
+                System.out.println(idbr.signIn(u).toString());
             } catch (LoginCredentialException lce) {
-                //lce.printStackTrace(); // impossible
+                // TODO: handle exception
             }
         });
 
@@ -83,43 +70,43 @@ public class DBReaderImplementationTest {
             try {
                 assertNull(idbr.signIn(u));
             } catch (LoginCredentialException lce) {
-                // 
+                // TODO: handle exception
             }
-        });     
+        });
+            
     }
-
-    /**
-     * checks that the IDs are generated correctly.
-     */
 
     @Test
     @Order(order = 2)
     public void testGenerateID() {
-        // maximum possible ID.
-        int total = idbr.count();
-        assertTrue(total < idbr.generateID());
+        int assID = -1;
+        if (!randomLogged.isEmpty())
+            assID = randomLogged.stream()
+                .max((u1, u2) -> 
+                    u1.getID() - u2.getID())
+                        .get().getID() + 1;
+
+        if (assID != -1)
+            assertEquals(assID, idbr.generateID());
+
+        assertNotEquals(assID, -1);
+        
     }
 
-    /**
-     * executed before any test, loads the connection
-     * so that we can access the database.
-     */
     @BeforeClass
     public static void init() {
+        Connection pConnection = null;
 
-        ResourceBundle rb = 
-            ResourceBundle
-                .getBundle("resources.database_access");
         try {
-            idbr = 
-                new DBReaderImplementation(
-                    DriverManager
-                        .getConnection(
-                            rb.getString("URL"),
-                            rb.getString("USER"),
-                            rb.getString("PASSWORD")));
+            pConnection = DriverManager
+                    .getConnection(
+                            "jdbc:mysql://localhost:3306/signApp?serverTimezone=Europe/Madrid&useSSL=false",
+                            "root",
+                            "abcd*1234");
         } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }   
+        }
+
+        idbr = new DBReaderImplementation(pConnection);
     }
 }
