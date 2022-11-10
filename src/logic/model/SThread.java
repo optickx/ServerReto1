@@ -10,14 +10,12 @@ import except.LoginCredentialException;
 import except.LoginExistsException;
 import except.NotRegisteredException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import logic.ControllerThread;
 import logic.DBReaderFactory;
 import logic.objects.User;
 import logic.objects.message.Request;
@@ -55,6 +53,7 @@ public class SThread extends Thread {
             }
             if (request.getRequestType().equals(RequestType.SIGNUP)) {
                 user = dbReader.signUp(request.getUser());
+
             }
             //Mandas los datos al cliente con todo correcto
             response = new Response(user, ResponseType.OK);
@@ -74,6 +73,7 @@ public class SThread extends Thread {
                 write.writeObject(response);
                 write.close();
                 read.close();
+                ControllerThread.closeThread();
             } catch (IOException ex) {
                 //Logger.getLogger(SThread.class.getName()).log(Level.SEVERE, null, ex);
             }

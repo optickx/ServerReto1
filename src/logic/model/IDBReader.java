@@ -9,19 +9,13 @@ import logic.objects.User;
 public interface IDBReader {
 
     /**
-     * @return the same user if everything worked, 
-     * null and exception if any error. 
-     * @throws LoginExistsException
-     * @throws EmailExistsException
-     * @throws NotRegisteredException
+     * @return
      *
      */
     public User signUp(User pUser) throws LoginExistsException, EmailExistsException, NotRegisteredException;
 
     /**
-     * @return the same user if eveything worked,
-     * null and exception if any error.
-     * @throws LoginCredentialException
+     * @return
      *
      */
     public User signIn(User pUser) throws LoginCredentialException;
