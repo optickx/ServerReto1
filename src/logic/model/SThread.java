@@ -8,7 +8,6 @@ package logic.model;
 import except.EmailExistsException;
 import except.LoginCredentialException;
 import except.LoginExistsException;
-import except.NotRegisteredException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -46,24 +45,22 @@ public class SThread extends Thread {
             write = new ObjectOutputStream(socket.getOutputStream());
             //Se carga el request y se crea la implementacion
             Request request = (Request) read.readObject();
-            IDBReader dbReader = DBReaderFactory.getAccess();
+            IClientServer dbReader = DBReaderFactory.getAccess();
 
             if (request.getRequestType().equals(RequestType.SIGNIN)) {
-                user = dbReader.signIn(request.getUser());
+                response = dbReader.signIn(request.getUser());
             }
             if (request.getRequestType().equals(RequestType.SIGNUP)) {
-                user = dbReader.signUp(request.getUser());
+                response = dbReader.signUp(request.getUser());
 
             }
             //Mandas los datos al cliente con todo correcto
-            response = new Response(user, ResponseType.OK);
+            response.setResponseType(ResponseType.OK);
 
         } catch (EmailExistsException e) {
             response = new Response(null, ResponseType.EMAIL_EXISTS_ERROR);
         } catch (LoginExistsException e) {
             response = new Response(null, ResponseType.LOGIN_EXISTS_ERROR);
-        } catch (NotRegisteredException e) {
-            response = new Response(null, ResponseType.NOT_REGISTERED_ERROR);
         } catch (LoginCredentialException e) {
             response = new Response(null, ResponseType.LOGIN_CREDENTIAL_ERROR);
         } catch (Exception e) {
