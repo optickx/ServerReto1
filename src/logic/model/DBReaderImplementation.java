@@ -39,7 +39,6 @@ public class DBReaderImplementation implements IClientServer {
      * (null) value.
      * @throws except.LoginCredentialException
      */
-
     @Override
     public Response signIn(User user) throws LoginCredentialException {
         Response response = null;
@@ -70,26 +69,15 @@ public class DBReaderImplementation implements IClientServer {
                 response.setUser(user);
             } else {
 
-            int ID = 0;
+                int ID = 0;
 
-            if (rs.next()) 
-                ID = 
-                    rs.getInt("id");
-            else 
-                throw new LoginCredentialException();
-
-            insertSignIn(ID, rightNow());
-        
-            return new User(ID,
-                rs.getString(2),
-                rs.getString(3),
-                rs.getString(4),
-                rs.getString(5),
-                rs.getTimestamp(6),
-                rs.getInt(7),
-                rs.getInt(8),
-                selectLastLogins(ID));
-                
+                if (rs.next()) {
+                    ID
+                            = rs.getInt("id");
+                } else {
+                    throw new LoginCredentialException();
+                }
+            }
         } catch (SQLException sqle) {
             throw new LoginCredentialException();
         }
@@ -105,18 +93,16 @@ public class DBReaderImplementation implements IClientServer {
      * @throws except.LoginExistsException
      * @throws except.EmailExistsException
      */
-    
     @Override
     public Response signUp(User pUser) throws LoginExistsException, EmailExistsException {
         Response response = null;
         try {
-            if (loginExists(pUser.getLogin())) 
-                throw new LoginExistsException();                
-
-            else if (emailExists(pUser.getEmail())) 
+            if (loginExists(pUser.getLogin())) {
+                throw new LoginExistsException();
+            } else if (emailExists(pUser.getEmail())) {
                 throw new EmailExistsException();
-                
-            
+            }
+
             int ID = generateID();
 
             stmt = con.prepareStatement(signUp);
@@ -128,21 +114,22 @@ public class DBReaderImplementation implements IClientServer {
             stmt.setTimestamp(6, rightNow());
 
             stmt.setInt(7,
-                (pUser.getPrivilege() == UserPrivilege.ADMIN) ? 1 : 0);
+                    (pUser.getPrivilege() == UserPrivilege.ADMIN) ? 1 : 0);
 
             stmt.setInt(8,
-                (pUser.getStatus() == UserStatus.ENABLED) ? 1 : 0);
+                    (pUser.getStatus() == UserStatus.ENABLED) ? 1 : 0);
 
             stmt.executeUpdate();
-            
-            List <Timestamp> l = 
-                pUser.getLastLogins();
 
-            if (l.size() == 10)
+            List<Timestamp> l
+                    = pUser.getLastLogins();
+
+            if (l.size() == 10) {
                 l.remove(0);
+            }
 
             l.add(rightNow());
-            
+
             l.forEach(t -> insertSignIn(ID, t));
 
             insertSignIn(ID, rightNow());
@@ -161,19 +148,18 @@ public class DBReaderImplementation implements IClientServer {
     }
 
     /**
-     * @param pEmail the email to be checked 
-     * in the table user.
+     * @param pEmail the email to be checked in the table user.
      * @return true if the email exists, false if not
      */
-
     protected boolean emailExists(String pEmail) {
         try {
             stmt = con.prepareStatement(checkEmail);
             stmt.setString(1, pEmail);
 
-            if (stmt.executeQuery().next())
+            if (stmt.executeQuery().next()) {
                 return true;
-            
+            }
+
         } catch (SQLException sqle) {
             // TODO: what the fuck, seriously, what the fuck
         }
@@ -181,18 +167,17 @@ public class DBReaderImplementation implements IClientServer {
     }
 
     /**
-     * @param pLogin the login to be checked 
-     * in the table user. 
+     * @param pLogin the login to be checked in the table user.
      * @return true if the email exists, false if not.
      */
-
     protected boolean loginExists(String pLogin) {
         try {
             stmt = con.prepareStatement(checkLogin);
             stmt.setString(1, pLogin);
 
-            if (stmt.executeQuery().next()) 
+            if (stmt.executeQuery().next()) {
                 return true;
+            }
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
@@ -204,7 +189,6 @@ public class DBReaderImplementation implements IClientServer {
      * @param pID is the ID of the user whose logins will be searched.
      * @return a List of Timestamps, chronologically sorted.
      */
-
     private List<Timestamp> selectLastLogins(int pID) {
         List<Timestamp> l
                 = new ArrayList<Timestamp>();
@@ -230,18 +214,17 @@ public class DBReaderImplementation implements IClientServer {
     }
 
     /**
-     * @param pID id of the user 
+     * @param pID id of the user
      * @param pSignIn date to be written
      * @return true if not errors, false if something went wrong.
      */
-
     private boolean insertSignIn(int pID, Timestamp pSignIn) {
         try {
-            PreparedStatement pstmt =
-                con.prepareStatement(insertSignIn);
+            PreparedStatement pstmt
+                    = con.prepareStatement(insertSignIn);
             pstmt.setTimestamp(1, pSignIn);
             pstmt.setInt(2, pID);
-                pstmt.executeUpdate();
+            pstmt.executeUpdate();
 
         } catch (SQLException sqle) {
             return false;
@@ -255,10 +238,9 @@ public class DBReaderImplementation implements IClientServer {
      *
      * @return a new ID.
      */
-
     protected int generateID() {
-        List <Integer> l =
-            new ArrayList<Integer>();
+        List<Integer> l
+                = new ArrayList<Integer>();
 
         try {
 
@@ -267,42 +249,42 @@ public class DBReaderImplementation implements IClientServer {
              * would modify the prepared statement from the function calling
              * this code and this could give errors.
              */
-
             ResultSet rs = con.prepareStatement(everyID)
-                .executeQuery();
+                    .executeQuery();
 
-            while (rs.next()) 
+            while (rs.next()) {
                 l.add(rs.getInt(1));
-            
+            }
+
         } catch (SQLException sqle) {
             //sqle.printStackTrace();
         }
 
         int i = 1;
 
-        if (l.isEmpty()) 
+        if (l.isEmpty()) {
             return i;
-
-        else if (l.contains(l.size())) {
-            while (l.contains(i)) 
+        } else if (l.contains(l.size())) {
+            while (l.contains(i)) {
                 i++;
-            
+            }
+
             return i;
         }
 
         //in case of not having a "perfect" case of IDs, we give the new one.
-         
         return l.stream()
-            .max((i1, i2) -> i1 - i2).get() + 1;
+                .max((i1, i2) -> i1 - i2).get() + 1;
     }
-
 
     protected int count() {
         try {
-            ResultSet rs = 
-                con.prepareStatement(count).executeQuery();
+            ResultSet rs
+                    = con.prepareStatement(count).executeQuery();
             if (rs.next()) // obviusly if nothing went wrong, there's a value
+            {
                 return rs.getInt(1);
+            }
 
         } catch (SQLException sqle) {
             // TODO: handle exception
@@ -312,20 +294,18 @@ public class DBReaderImplementation implements IClientServer {
         return -1;
     }
 
-
     /**
      * @return this instant timestamp
      */
-
     private Timestamp rightNow() {
         return Timestamp.valueOf(LocalDateTime.now());
     }
 
     /**
      * just a simple getter.
+     *
      * @return the connection being used in this class.
      */
-
     public Connection getConnection() {
         return con;
     }
@@ -333,27 +313,27 @@ public class DBReaderImplementation implements IClientServer {
     // we do not have to create in every module.
     private PreparedStatement stmt;
 
-    private final String checkLogin =
-        "SELECT * FROM user WHERE login = ?";
+    private final String checkLogin
+            = "SELECT * FROM user WHERE login = ?";
 
-    private final String checkEmail =
-        "SELECT * FROM user WHERE email = ?";
+    private final String checkEmail
+            = "SELECT * FROM user WHERE email = ?";
 
-    private final String count = 
-        "SELECT COUNT(*) FROM user";
+    private final String count
+            = "SELECT COUNT(*) FROM user";
 
-    private final String everyID =
-        "SELECT id FROM user";
+    private final String everyID
+            = "SELECT id FROM user";
 
-    private final String lastSignIns =
-        "SELECT lastSignIn FROM signin WHERE id = ?";
+    private final String lastSignIns
+            = "SELECT lastSignIn FROM signin WHERE id = ?";
 
-    private final String signUp =
-        "INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String signUp
+            = "INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private final String signIn =
-        "SELECT * FROM user WHERE login = ? AND password = ?";
+    private final String signIn
+            = "SELECT * FROM user WHERE login = ? AND password = ?";
 
-    private final String insertSignIn =
-        "INSERT INTO signIn VALUES (?, ?)";
+    private final String insertSignIn
+            = "INSERT INTO signIn VALUES (?, ?)";
 }
