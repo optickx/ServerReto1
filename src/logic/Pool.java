@@ -9,9 +9,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Pool {
-
+    
     private static Stack stack = new Stack();
-    private Connection con;
+    private static Connection con;
     private final ResourceBundle config
             = ResourceBundle.getBundle("resources.database_access");
 
@@ -19,41 +19,42 @@ public class Pool {
     private final String url = config.getString("URL"),
             user = config.getString("USER"),
             pass = config.getString("PASS");
-
+    
     public Connection openConnection() {
         con = null;
         try {
             con = DriverManager
                     .getConnection(url, user, pass);
-
+            stack.add(con);
         } catch (SQLException ex) {
             Logger.getLogger(Pool.class.getName()).log(Level.SEVERE, null, ex);
         }
         return con;
     }
-
-    public void closeConnection(Connection con) {
-        try {
-            con.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(Pool.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
+    
     public Connection getConnection() {
         if (!stack.empty()) {
             return (Connection) stack.pop();
         } else {
             return openConnection();
+            
         }
     }
-
+    
     public void returnConnection(Connection con) {
         stack.push(con);
     }
-
+    
     public static void removeAll() {
+        while (!stack.isEmpty()) {
+            con = (Connection) stack.pop();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(Pool.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         stack.clear();
     }
-
+    
 }

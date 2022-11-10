@@ -14,6 +14,7 @@ import logic.objects.message.types.ResponseType;
 public class ControllerThread {
 
     private static int contadorThreads = 0;
+    private final int cantUsers = 10;
 
     public void run() throws ServerCapacityException, IOException {
         ServerSocket miServidor = null;
@@ -27,15 +28,14 @@ public class ControllerThread {
         }
     }
 
-    public synchronized void contadorHilos(int cont, Socket socket) throws ServerCapacityException {
-        if (contadorThreads > 10) {
+    public synchronized void contadorHilos(int cont, Socket socket) {
+        if (contadorThreads > cantUsers) {
             try {
                 Response response = new Response(null, ResponseType.SERVER_CAPACITY_ERROR);
                 ObjectOutputStream write = new ObjectOutputStream(socket.getOutputStream());
                 write.writeObject(response);
-                //throw new ServerCapacityException();  
             } catch (IOException e) {
-
+                e.printStackTrace();
             }
         }
     }
@@ -47,6 +47,7 @@ public class ControllerThread {
             thread.start();
             contadorThreads++;
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
