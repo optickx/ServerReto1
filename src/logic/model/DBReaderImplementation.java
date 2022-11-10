@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 import logic.objects.*;
+import logic.objects.message.Response;
 
-public class DBReaderImplementation implements IDBReader {
+public class DBReaderImplementation implements IClientServer {
 
     /**
      * the value of the connection is given at the constructor. should be used
@@ -39,7 +40,8 @@ public class DBReaderImplementation implements IDBReader {
      * @throws except.LoginCredentialException
      */
     @Override
-    public User signIn(User user) throws LoginCredentialException {
+    public Response signIn(User user) throws LoginCredentialException {
+        Response response = null;
         try {
             stmt = con.prepareStatement(signIn);
             stmt.setString(1, user.getLogin());
@@ -49,27 +51,28 @@ public class DBReaderImplementation implements IDBReader {
              * the values of the last SignIns are obtained by using the ID to
              * seach it.
              */
-            if(rs.next()){
+            if (rs.next()) {
                 int ID = rs.getInt("id");
                 insertSignIn(ID, rightNow());
                 user = new User(
-                    ID,
-                    rs.getString(2),
-                    rs.getString(3),
-                    rs.getString(4),
-                    rs.getString(5),
-                    rs.getTimestamp(6),
-                    rs.getInt(7),
-                    rs.getInt(8),
-                    selectLastLogins(ID));
-            }
-            else{
+                        ID,
+                        rs.getString(2),
+                        rs.getString(3),
+                        rs.getString(4),
+                        rs.getString(5),
+                        rs.getTimestamp(6),
+                        rs.getInt(7),
+                        rs.getInt(8),
+                        selectLastLogins(ID));
+                response = new Response();
+                response.setUser(user);
+            } else {
                 throw new LoginCredentialException();
             }
         } catch (SQLException sqle) {
             throw new LoginCredentialException();
         }
-        return user;
+        return response;
     }
 
     /**
@@ -82,7 +85,8 @@ public class DBReaderImplementation implements IDBReader {
      * @throws except.EmailExistsException
      */
     @Override
-    public User signUp(User pUser) throws LoginExistsException, EmailExistsException {
+    public Response signUp(User pUser) throws LoginExistsException, EmailExistsException {
+        Response response = null;
         try {
             if (loginExists(pUser.getLogin())) {
                 throw new LoginExistsException();
@@ -118,8 +122,10 @@ public class DBReaderImplementation implements IDBReader {
             }
 
             insertSignIn(ID, rightNow());
+            response = new Response();
+            response.setUser(pUser);
 
-            return pUser;
+            return response;
 
         } catch (SQLException sqle) {
             //sqle.printStackTrace();
