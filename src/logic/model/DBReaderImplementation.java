@@ -39,6 +39,7 @@ public class DBReaderImplementation implements IClientServer {
      * (null) value.
      * @throws except.LoginCredentialException
      */
+
     @Override
     public Response signIn(User user) throws LoginCredentialException {
         Response response = null;
@@ -47,9 +48,10 @@ public class DBReaderImplementation implements IClientServer {
             stmt.setString(1, user.getLogin());
             stmt.setString(2, user.getPassword());
             ResultSet rs = stmt.executeQuery();
+
             /**
              * the values of the last SignIns are obtained by using the ID to
-             * seach it.
+             * search it.
              */
             if (rs.next()) {
                 int ID = rs.getInt("id");
@@ -67,8 +69,27 @@ public class DBReaderImplementation implements IClientServer {
                 response = new Response();
                 response.setUser(user);
             } else {
+
+            int ID = 0;
+
+            if (rs.next()) 
+                ID = 
+                    rs.getInt("id");
+            else 
                 throw new LoginCredentialException();
-            }
+
+            insertSignIn(ID, rightNow());
+        
+            return new User(ID,
+                rs.getString(2),
+                rs.getString(3),
+                rs.getString(4),
+                rs.getString(5),
+                rs.getTimestamp(6),
+                rs.getInt(7),
+                rs.getInt(8),
+                selectLastLogins(ID));
+                
         } catch (SQLException sqle) {
             throw new LoginCredentialException();
         }
@@ -84,18 +105,18 @@ public class DBReaderImplementation implements IClientServer {
      * @throws except.LoginExistsException
      * @throws except.EmailExistsException
      */
+    
     @Override
     public Response signUp(User pUser) throws LoginExistsException, EmailExistsException {
         Response response = null;
         try {
-            if (loginExists(pUser.getLogin())) {
-                throw new LoginExistsException();
-            }
+            if (loginExists(pUser.getLogin())) 
+                throw new LoginExistsException();                
 
-            if (emailExists(pUser.getEmail())) {
+            else if (emailExists(pUser.getEmail())) 
                 throw new EmailExistsException();
-            }
-
+                
+            
             int ID = generateID();
 
             stmt = con.prepareStatement(signUp);
@@ -107,65 +128,74 @@ public class DBReaderImplementation implements IClientServer {
             stmt.setTimestamp(6, rightNow());
 
             stmt.setInt(7,
-                    (pUser.getPrivilege() == UserPrivilege.ADMIN) ? 1 : 0);
+                (pUser.getPrivilege() == UserPrivilege.ADMIN) ? 1 : 0);
 
             stmt.setInt(8,
-                    (pUser.getStatus() == UserStatus.ENABLED) ? 1 : 0);
+                (pUser.getStatus() == UserStatus.ENABLED) ? 1 : 0);
 
             stmt.executeUpdate();
+            
+            List <Timestamp> l = 
+                pUser.getLastLogins();
 
-            pUser.setID(ID);
+            if (l.size() == 10)
+                l.remove(0);
 
-            if (!pUser.getLastLogins().isEmpty()) {
-                pUser.getLastLogins().forEach(l
-                        -> insertSignIn(ID, l));
-            }
+            l.add(rightNow());
+            
+            l.forEach(t -> insertSignIn(ID, t));
 
             insertSignIn(ID, rightNow());
             response = new Response();
             response.setUser(pUser);
+            pUser.setLastLogins(l);
 
             return response;
 
         } catch (SQLException sqle) {
-            //sqle.printStackTrace();
+            // sqle.printStackTrace();
         } catch (NullPointerException npe) {
-            //npe.printStackTrace();
+            // npe.printStackTrace();
         }
         return null;
     }
+
+    /**
+     * @param pEmail the email to be checked 
+     * in the table user.
+     * @return true if the email exists, false if not
+     */
 
     protected boolean emailExists(String pEmail) {
         try {
             stmt = con.prepareStatement(checkEmail);
             stmt.setString(1, pEmail);
-            ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
+            if (stmt.executeQuery().next())
                 return true;
-            }
-
+            
         } catch (SQLException sqle) {
-            // TODO: handle exception
+            // TODO: what the fuck, seriously, what the fuck
         }
         return false;
     }
 
     /**
-     * tells if exists or not obsivus
+     * @param pLogin the login to be checked 
+     * in the table user. 
+     * @return true if the email exists, false if not.
      */
+
     protected boolean loginExists(String pLogin) {
         try {
             stmt = con.prepareStatement(checkLogin);
             stmt.setString(1, pLogin);
-            ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
+            if (stmt.executeQuery().next()) 
                 return true;
-            }
 
         } catch (SQLException sqle) {
-            // TODO: handle exception
+            sqle.printStackTrace();
         }
         return false;
     }
@@ -174,6 +204,7 @@ public class DBReaderImplementation implements IClientServer {
      * @param pID is the ID of the user whose logins will be searched.
      * @return a List of Timestamps, chronologically sorted.
      */
+
     private List<Timestamp> selectLastLogins(int pID) {
         List<Timestamp> l
                 = new ArrayList<Timestamp>();
@@ -198,15 +229,21 @@ public class DBReaderImplementation implements IClientServer {
         return l;
     }
 
+    /**
+     * @param pID id of the user 
+     * @param pSignIn date to be written
+     * @return true if not errors, false if something went wrong.
+     */
+
     private boolean insertSignIn(int pID, Timestamp pSignIn) {
         try {
-            stmt = con.prepareStatement(insertSignIn);
-            stmt.setTimestamp(1, pSignIn);
-            stmt.setInt(2, pID);
-            stmt.executeUpdate();
+            PreparedStatement pstmt =
+                con.prepareStatement(insertSignIn);
+            pstmt.setTimestamp(1, pSignIn);
+            pstmt.setInt(2, pID);
+                pstmt.executeUpdate();
 
         } catch (SQLException sqle) {
-            //sqle.printStackTrace();
             return false;
         }
         return true;
@@ -218,9 +255,10 @@ public class DBReaderImplementation implements IClientServer {
      *
      * @return a new ID.
      */
+
     protected int generateID() {
-        List<Integer> l
-                = new ArrayList<Integer>();
+        List <Integer> l =
+            new ArrayList<Integer>();
 
         try {
 
@@ -229,43 +267,65 @@ public class DBReaderImplementation implements IClientServer {
              * would modify the prepared statement from the function calling
              * this code and this could give errors.
              */
+
             ResultSet rs = con.prepareStatement(everyID)
-                    .executeQuery();
+                .executeQuery();
 
-            while (rs.next()) {
+            while (rs.next()) 
                 l.add(rs.getInt(1));
-            }
-
+            
         } catch (SQLException sqle) {
             //sqle.printStackTrace();
         }
 
-        if (l.isEmpty()) {
-            return 1;
-        } else if (l.contains(l.size())) {
-            return l.size() + 1;
+        int i = 1;
+
+        if (l.isEmpty()) 
+            return i;
+
+        else if (l.contains(l.size())) {
+            while (l.contains(i)) 
+                i++;
+            
+            return i;
         }
 
-        /**
-         * in case of not having a "perfect" case of IDs, we give the new one.
-         */
+        //in case of not having a "perfect" case of IDs, we give the new one.
+         
         return l.stream()
-                .max((i1, i2) -> i1 - i2).get() + 1;
-
+            .max((i1, i2) -> i1 - i2).get() + 1;
     }
+
+
+    protected int count() {
+        try {
+            ResultSet rs = 
+                con.prepareStatement(count).executeQuery();
+            if (rs.next()) // obviusly if nothing went wrong, there's a value
+                return rs.getInt(1);
+
+        } catch (SQLException sqle) {
+            // TODO: handle exception
+            sqle.printStackTrace();
+        }
+
+        return -1;
+    }
+
 
     /**
      * @return this instant timestamp
      */
+
     private Timestamp rightNow() {
         return Timestamp.valueOf(LocalDateTime.now());
     }
 
     /**
      * just a simple getter.
-     *
      * @return the connection being used in this class.
      */
+
     public Connection getConnection() {
         return con;
     }
@@ -273,28 +333,27 @@ public class DBReaderImplementation implements IClientServer {
     // we do not have to create in every module.
     private PreparedStatement stmt;
 
-    private final String checkLogin
-            = "SELECT login FROM user WHERE login = ?";
+    private final String checkLogin =
+        "SELECT * FROM user WHERE login = ?";
 
-    private final String checkEmail
-            = "SELECT email FROM user WHERE email = ?";
+    private final String checkEmail =
+        "SELECT * FROM user WHERE email = ?";
 
-    //private final String count = 
-    //    "SELECT COUNT(*) FROM user";
-    private final String everyID
-            = "SELECT id FROM user";
+    private final String count = 
+        "SELECT COUNT(*) FROM user";
 
-    private final String lastSignIns
-            = "SELECT lastSignIn FROM signin WHERE id = ?";
+    private final String everyID =
+        "SELECT id FROM user";
 
-    private final String signUp
-            = "INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String lastSignIns =
+        "SELECT lastSignIn FROM signin WHERE id = ?";
 
-    private final String signIn
-            = "SELECT * FROM USER WHERE LOGIN= ? AND PASSWORD= ?";
-//"SELECT * FROM USER WHERE LOGIN=? AND PASSWORD=?";
+    private final String signUp =
+        "INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private final String insertSignIn
-            = "INSERT INTO signIn VALUES (?, ?)";
+    private final String signIn =
+        "SELECT * FROM user WHERE login = ? AND password = ?";
 
+    private final String insertSignIn =
+        "INSERT INTO signIn VALUES (?, ?)";
 }

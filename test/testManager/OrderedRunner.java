@@ -1,4 +1,4 @@
-package logic.model;
+package testManager;
 
 
 import org.junit.runners.BlockJUnit4ClassRunner;
