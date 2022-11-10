@@ -136,6 +136,12 @@ public class DBReaderImplementation implements IDBReader {
         return null;
     }
 
+    /**
+     * @param pEmail the email to be checked 
+     * in the table user.
+     * @return true if the email exists, false if not
+     */
+
     protected boolean emailExists(String pEmail) {
         try {
             stmt = con.prepareStatement(checkEmail);
@@ -151,7 +157,9 @@ public class DBReaderImplementation implements IDBReader {
     }
 
     /**
-     * tells if exists or not obsivus
+     * @param pLogin the login to be checked 
+     * in the table user. 
+     * @return true if the email exists, false if not.
      */
 
     protected boolean loginExists(String pLogin) {
@@ -172,6 +180,7 @@ public class DBReaderImplementation implements IDBReader {
      * @param pID is the ID of the user whose logins will be searched.
      * @return a List of Timestamps, chronologically sorted.
      */
+
     private List<Timestamp> selectLastLogins(int pID) {
         List<Timestamp> l
                 = new ArrayList<Timestamp>();
@@ -196,6 +205,12 @@ public class DBReaderImplementation implements IDBReader {
         return l;
     }
 
+    /**
+     * @param pID id of the user 
+     * @param pSignIn date to be written
+     * @return true if not errors, false if something went wrong.
+     */
+
     private boolean insertSignIn(int pID, Timestamp pSignIn) {
         try {
             PreparedStatement pstmt =
@@ -216,9 +231,10 @@ public class DBReaderImplementation implements IDBReader {
      *
      * @return a new ID.
      */
+
     protected int generateID() {
-        List <Integer> l
-                = new ArrayList<Integer>();
+        List <Integer> l =
+            new ArrayList<Integer>();
 
         try {
 
@@ -229,12 +245,11 @@ public class DBReaderImplementation implements IDBReader {
              */
 
             ResultSet rs = con.prepareStatement(everyID)
-                    .executeQuery();
+                .executeQuery();
 
-            while (rs.next()) {
+            while (rs.next()) 
                 l.add(rs.getInt(1));
-            }
-
+            
         } catch (SQLException sqle) {
             //sqle.printStackTrace();
         }
@@ -247,26 +262,46 @@ public class DBReaderImplementation implements IDBReader {
         else if (l.contains(l.size())) {
             while (l.contains(i)) 
                 i++;
+            
             return i;
         }
+
         //in case of not having a "perfect" case of IDs, we give the new one.
          
         return l.stream()
             .max((i1, i2) -> i1 - i2).get() + 1;
     }
 
+
+    protected int count() {
+        try {
+            ResultSet rs = 
+                con.prepareStatement(count).executeQuery();
+            if (rs.next()) // obviusly if nothing went wrong, there's a value
+                return rs.getInt(1);
+
+        } catch (SQLException sqle) {
+            // TODO: handle exception
+            sqle.printStackTrace();
+        }
+
+        return -1;
+    }
+
+
     /**
      * @return this instant timestamp
      */
+
     private Timestamp rightNow() {
         return Timestamp.valueOf(LocalDateTime.now());
     }
 
     /**
      * just a simple getter.
-     *
      * @return the connection being used in this class.
      */
+
     public Connection getConnection() {
         return con;
     }
@@ -274,29 +309,27 @@ public class DBReaderImplementation implements IDBReader {
     // we do not have to create in every module.
     private PreparedStatement stmt;
 
-    private final String checkLogin
-            = "SELECT * FROM user WHERE login = ?";
+    private final String checkLogin =
+        "SELECT * FROM user WHERE login = ?";
 
-    private final String checkEmail
-            = "SELECT * FROM user WHERE email = ?";
+    private final String checkEmail =
+        "SELECT * FROM user WHERE email = ?";
 
-    //private final String count = 
-    //    "SELECT COUNT(*) FROM user";
-    private final String everyID
-            = "SELECT id FROM user";
+    private final String count = 
+        "SELECT COUNT(*) FROM user";
 
-    private final String lastSignIns
-            = "SELECT lastSignIn FROM signin WHERE id = ?";
+    private final String everyID =
+        "SELECT id FROM user";
 
-    private final String signUp
-            = "INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String lastSignIns =
+        "SELECT lastSignIn FROM signin WHERE id = ?";
 
-    private final String signIn
-            = "SELECT * FROM user WHERE login = ? AND password = ?";
+    private final String signUp =
+        "INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private final String insertSignIn
-            = "INSERT INTO signIn VALUES (?, ?)";
+    private final String signIn =
+        "SELECT * FROM user WHERE login = ? AND password = ?";
 
-    public final String tableName = "user";
-
+    private final String insertSignIn =
+        "INSERT INTO signIn VALUES (?, ?)";
 }

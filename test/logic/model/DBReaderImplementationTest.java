@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -98,16 +97,8 @@ public class DBReaderImplementationTest {
     @Order(order = 2)
     public void testGenerateID() {
         // maximum possible ID.
-        int total = 0;
-        try {
-            ResultSet rs =  idbr
-                .getConnection()
-                    .prepareStatement("SELECT COUNT(*) FROM" + idbr.tableName)
-                        .executeQuery();
-            total = rs.getInt(1);
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
+        int total = idbr.count();
+        assertTrue(total < idbr.generateID());
     }
 
     /**
@@ -116,6 +107,7 @@ public class DBReaderImplementationTest {
      */
     @BeforeClass
     public static void init() {
+
         ResourceBundle rb = 
             ResourceBundle
                 .getBundle("resources.database_access");
