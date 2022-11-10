@@ -29,9 +29,9 @@ public class DBReaderImplementationTest {
 
     private static final List<User> 
         randomLogged = 
-            SampleUsers.randomUsers(20),
+            UserGenerator.randomUsers(25),
         randomNotLogged = 
-            SampleUsers.randomUsers(20);
+            UserGenerator.randomUsers(20);
 
     /**
      * registers all the user in randomLogged collection.
@@ -41,7 +41,6 @@ public class DBReaderImplementationTest {
     @Test
     @Order(order = 0)
     public void testSignUp() {
-
         randomLogged.forEach(u -> {
             try {
                 assertEquals(u, idbr.signUp(u));
