@@ -95,6 +95,7 @@ public class DBReaderImplementation implements IDBReader {
 
             else if (emailExists(pUser.getEmail())) 
                 throw new EmailExistsException();
+                
             
             int ID = generateID();
 

@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `signin`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `signin` (
-  `lastSignIn` timestamp NOT NULL,
+  `lastSignIn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `id` int(11) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   KEY `id` (`id`),
@@ -37,6 +37,7 @@ CREATE TABLE `signin` (
 
 LOCK TABLES `signin` WRITE;
 /*!40000 ALTER TABLE `signin` DISABLE KEYS */;
+INSERT INTO `signin` VALUES ('2022-11-10 08:39:41',1);
 /*!40000 ALTER TABLE `signin` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -57,7 +58,7 @@ CREATE TABLE `user` (
   `userStatus` int(2) DEFAULT NULL,
   `privilege` int(2) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY (`login`, `email`)
+  UNIQUE KEY `login` (`login`,`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -67,6 +68,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'javi','javiermartin@gmail.com','Javier Martin','abcd*1234','2022-11-10 08:39:41',1,1);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -79,4 +81,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-11-02  9:31:35
+-- Dump completed on 2022-11-10  9:41:40
