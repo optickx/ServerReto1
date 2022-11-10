@@ -26,9 +26,9 @@ public class DBReaderImplementationTest {
 
     private static final List<User> 
         randomLogged = 
-            SampleUsers.randomUsers(),
+            SampleUsers.randomUsers(20),
         randomNotLogged = 
-            SampleUsers.randomUsers();
+            SampleUsers.randomUsers(15);
 
     @Test
     @Order(order = 0)
@@ -78,31 +78,21 @@ public class DBReaderImplementationTest {
 
     @Test
     @Order(order = 2)
-    public void testGenerateID() {
-        int assID = -1;
-        if (!randomLogged.isEmpty())
-            assID = randomLogged.stream()
-                .max((u1, u2) -> 
-                    u1.getID() - u2.getID())
-                        .get().getID() + 1;
+    public void testGenerateID() {}
 
-        if (assID != -1)
-            assertEquals(assID, idbr.generateID());
-
-        assertNotEquals(assID, -1);
-        
-    }
-
+    /**
+     * method that sets connection.
+     */
     @BeforeClass
     public static void init() {
         Connection pConnection = null;
 
         try {
             pConnection = DriverManager
-                    .getConnection(
-                            "jdbc:mysql://localhost:3306/signApp?serverTimezone=Europe/Madrid&useSSL=false",
-                            "root",
-                            "abcd*1234");
+                .getConnection(
+                "jdbc:mysql://localhost:3306/signApp?serverTimezone=Europe/Madrid&useSSL=false",
+                "root",
+                "abcd*1234");
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         }

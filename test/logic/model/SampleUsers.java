@@ -13,87 +13,85 @@ import logic.objects.UserStatus;
 
 public abstract class SampleUsers {
 
-    public static List <User> randomUsers() {
-        List <User> l = 
-            new ArrayList <> ();
-        
-        for (int i = 0; i < 20; i++) 
-            l.add(randomUser());
+    /**
+     * @param n amount of dates
+     * @return collection of dates
+     */
 
-        Collections.shuffle(l);
-
-        //l.forEach(u -> System.out.println(u));
-
-        return l;
-    }
-
-    public static List <User> teamUsers() {
-        List <User> l = 
-            new ArrayList <> ();
-
-        setValues();
-        
-        l.add(eneko);
-        l.add(dani);
-        l.add(roke);
-        l.add(nerea);
-
-        Collections.shuffle(l);
-
-        return l;
-    }
-
-    private static List <Timestamp> randomDates() {
+    private static List <Timestamp> randomDates(int n) {
         List <Timestamp> l = 
             new ArrayList <Timestamp> ();
 
-        for (int i = 0; i < 10; i++) 
-            l.add(getRandomDate());
+        for (int i = 0; i < n; i++) 
+            l.add(randomDate());
 
         return l;
     }
 
-    private static Timestamp getRandomDate() {
-        return new Timestamp(
-            (long) (Math.random() * 
-                (ZonedDateTime.of(
+    /**
+     * @return a randomly generated exact moment in 
+     * history between New Years Day 1899 and now.
+     */
+
+    private static Timestamp randomDate() {
+        long 
+            now = (ZonedDateTime.of(
                     LocalDateTime.now(), 
                         ZoneId.systemDefault())
                             .toInstant()
-                                .toEpochMilli())));
-    }
+                                .toEpochMilli()),
 
-    private static User dani, nerea, eneko, roke;
-
-    
-    private static void setValues() {
-        dani = new User(0, "opticks", "danielbarrios2002@gmail.com", 
-            "Daniel Barrios", "abcd*1234", getRandomDate(), 
-            UserStatus.ENABLED, UserPrivilege.ADMIN, randomDates());
-        
-        nerea = new User(0, "FBe9", "nereaoceja2003@tartanga.eus", 
-            "Nerea Oceja", "hola_buenas_tardes", getRandomDate(), 
-            UserStatus.DISABLED, UserPrivilege.USER, randomDates());
-
-        eneko = new User(0, "elListoDeLaClase", "enekoruiz@tartanga.eus", 
-        "Eneko Ruiz", "el-cHiC0_qUE_Te_gUsTa", getRandomDate(), 
-        UserStatus.ENABLED, UserPrivilege.USER, randomDates());
-
-        roke = new User(4, "rokelius", "rokeiturralde@gmail.com", 
-        "Roke Iturralde", "abcd*1234", getRandomDate(), 
-        UserStatus.ENABLED, UserPrivilege.USER, randomDates());      
-    }
-
-
-    private static User randomUser() {
+            yearZero = (ZonedDateTime.of(
+                LocalDateTime.of(1899, 1, 1, 0, 0), 
+                    ZoneId.systemDefault())
+                        .toInstant()
+                            .toEpochMilli());
         return 
+            new Timestamp(
+                (long) (Math.random() * (now - yearZero)) + yearZero);
+    }
+
+    /**
+     * @param n number of random dates.
+     * @return a randomly generated user.
+     */
+    
+    private static User randomUser(int n) {
+        String 
+            email = new String(""),
+            login = new String("");
+        /*
+         * the login and email have to be controlled, it's very
+         * important that they are not very short or an empty 
+         * character because it may happen that two of the randomly
+         * generated Users have the same login or email.
+         */
+
+        while (email.length() < 3)
+            email = String.valueOf(randomChars(33, 122));
+        
+        email += "@gmail.com";
+
+        if (25 < email.length())
+            email =
+                email
+                    .subSequence(email.length() - 25, email.length())
+                        .toString();
+
+        while (login.length() < 4)
+            login = String.valueOf(randomChars(33, 122));
+
+
+        User u = 
             new User(0,
+            login,
+            email,
             String.valueOf(randomChars(33, 122)),
-            String.valueOf(randomChars(33, 122)) + "@gmail.com",
             String.valueOf(randomChars(33, 122)),
-            String.valueOf(randomChars(33, 122)),
-            getRandomDate(), (int) Math.random() * 2,
-            (int) Math.random() * 2, randomDates());
+            randomDate(), (int) (Math.random() * 2),
+            (int) (Math.random() * 2), randomDates(5));
+
+        return u;
     }
 
     private static char [] randomChars(int a, int b) {
@@ -105,7 +103,44 @@ public abstract class SampleUsers {
         return c;
     }
 
-    public static void main(String[] args) {
-        System.out.println(randomUser().toString());
+    public static List <User> randomUsers(int n) {
+        List <User> l = 
+            new ArrayList <> ();
+        
+        for (int i = 0; i < n; i++) 
+            l.add(randomUser(5));
+
+        Collections.shuffle(l);
+
+        return l;
+    }
+
+    public static List <User> teamUsers() {
+        List <User> l = 
+            new ArrayList <> ();
+
+        l.add(
+            new User(0, "opticks", "danielbarrios2002@gmail.com", 
+            "Daniel Barrios", "abcd*1234", randomDate(), 
+            UserStatus.ENABLED, UserPrivilege.ADMIN, randomDates(15)));
+
+        l.add(
+            new User(0, "FBe9", "nereaoceja2003@tartanga.eus", 
+            "Nerea Oceja", "hola_buenas_tardes", randomDate(), 
+            UserStatus.DISABLED, UserPrivilege.USER, randomDates(10)));
+
+        l.add(
+            new User(0, "elListoDeLaClase", "enekoruiz@tartanga.eus", 
+            "Eneko Ruiz", "el-cHiC0_qUE_Te_gUsTa", randomDate(), 
+            UserStatus.ENABLED, UserPrivilege.USER, randomDates(10)));
+
+        l.add(
+            new User(4, "rokelius", "rokeiturralde@gmail.com", 
+            "Roke Iturralde", "abcd*1234", randomDate(), 
+            UserStatus.ENABLED, UserPrivilege.USER, randomDates(10)));
+
+        Collections.shuffle(l);
+
+        return l;
     }
 }
