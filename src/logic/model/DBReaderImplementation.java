@@ -49,7 +49,7 @@ public class DBReaderImplementation implements IDBReader {
 
             /**
              * the values of the last SignIns are obtained by using the ID to
-             * seach it.
+             * search it.
              */
 
             int ID = 0;
@@ -63,8 +63,8 @@ public class DBReaderImplementation implements IDBReader {
             insertSignIn(ID, rightNow());
         
             return new User(ID,
-                rs.getString("email"),
-                rs.getString("fullName"),
+                rs.getString(2),
+                rs.getString(3),
                 rs.getString(4),
                 rs.getString(5),
                 rs.getTimestamp(6),

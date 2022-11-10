@@ -1,5 +1,7 @@
 package logic.model;
 
+import testManager.Order;
+import testManager.OrderedRunner;
 import except.EmailExistsException;
 import except.LoginCredentialException;
 import except.LoginExistsException;
