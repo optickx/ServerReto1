@@ -12,11 +12,6 @@ import logic.objects.UserPrivilege;
 import logic.objects.UserStatus;
 
 public abstract class SampleUsers {
-
-    public static void main(String[] args) {
-        randomDates(60).stream().sorted().forEach(d -> System.out.println(d));
-    }
-
     /**
      * @param n amount of dates
      * @return collection of dates
