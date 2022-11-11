@@ -123,28 +123,28 @@ public class DBReaderImplementation implements IClientServer {
 
             List<Timestamp> l
                     = pUser.getLastLogins();
-
-            if (l.size() == 10) {
-                l.remove(0);
+            if (l != null) {
+                if (l.size() >= 10) 
+                    for (int i = 0; 9 < l.size(); i++) 
+                        l.remove(i);               
             }
-
+            else
+                l = new ArrayList <Timestamp> ();
+            
             l.add(rightNow());
-
+            
             l.forEach(t -> insertSignIn(ID, t));
 
-            insertSignIn(ID, rightNow());
+            pUser.setLastLogins(l);
             response = new Response();
             response.setUser(pUser);
-            pUser.setLastLogins(l);
-
-            return response;
 
         } catch (SQLException sqle) {
             // sqle.printStackTrace();
         } catch (NullPointerException npe) {
-            // npe.printStackTrace();
+            npe.printStackTrace();
         }
-        return null;
+        return response;
     }
 
     /**
