@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import logic.objects.User;
-import testManaging.Order;
-import testManaging.OrderedRunner;
+import testManager.Order;
+import testManager.OrderedRunner;
 
 /**
  * @author dani
