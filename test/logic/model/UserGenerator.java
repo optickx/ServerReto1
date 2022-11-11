@@ -135,7 +135,7 @@ public abstract class UserGenerator {
             UserStatus.ENABLED, UserPrivilege.USER, randomDates(10)));
 
         l.add(
-            new User(4, "roke", "rokeiturralde@tartanga.eus", 
+            new User(0, "roke", "rokeiturralde@tartanga.eus", 
             "Roke Iturralde", "abcd*1234", randomDate(), 
             UserStatus.ENABLED, UserPrivilege.USER, randomDates(10)));
 
