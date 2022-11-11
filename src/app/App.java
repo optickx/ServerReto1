@@ -3,15 +3,18 @@ package app;
 import logic.ControllerThread;
 
 /**
- *
- * @author Roke
+ * @author dani
  */
 public class App {
 
+    /**
+     * runs the threads.
+     * @param args unused parameters
+     * @throws Exception
+     */
+    
     public static void main(String[] args) throws Exception {
-//Starts the controller of working threads
-        ControllerThread controller = new ControllerThread();
-        controller.run();
+        new ControllerThread().run();
 
     }
 }

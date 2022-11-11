@@ -25,9 +25,9 @@ public class DBReaderImplementation implements IClientServer {
 
     /**
      * to the database is necessary to give a connection to this database.
-     *
      * @param pConnection will be used by every module.
      */
+
     public DBReaderImplementation(Connection pConnection) {
         con = pConnection;
     }
@@ -42,6 +42,7 @@ public class DBReaderImplementation implements IClientServer {
      * (null) value.
      * @throws except.LoginCredentialException
      */
+
     @Override
     public Response signIn(User user) throws LoginCredentialException {
         Response response = null;
@@ -96,6 +97,7 @@ public class DBReaderImplementation implements IClientServer {
      * @throws except.LoginExistsException
      * @throws except.EmailExistsException
      */
+
     @Override
     public Response signUp(User pUser) throws LoginExistsException, EmailExistsException {
         Response response = null;
@@ -156,6 +158,7 @@ public class DBReaderImplementation implements IClientServer {
      * @param pEmail the email to be checked in the table user.
      * @return true if the email exists, false if not
      */
+
     protected boolean emailExists(String pEmail) {
         try {
             stmt = con.prepareStatement(checkEmail);
@@ -175,6 +178,7 @@ public class DBReaderImplementation implements IClientServer {
      * @param pLogin the login to be checked in the table user.
      * @return true if the email exists, false if not.
      */
+
     protected boolean loginExists(String pLogin) {
         try {
             stmt = con.prepareStatement(checkLogin);
@@ -194,6 +198,7 @@ public class DBReaderImplementation implements IClientServer {
      * @param pID is the ID of the user whose logins will be searched.
      * @return a List of Timestamps, chronologically sorted.
      */
+
     private List<Timestamp> selectLastLogins(int pID) {
         List<Timestamp> l
                 = new ArrayList<Timestamp>();
@@ -223,6 +228,7 @@ public class DBReaderImplementation implements IClientServer {
      * @param pSignIn date to be written
      * @return true if not errors, false if something went wrong.
      */
+
     private boolean insertSignIn(int pID, Timestamp pSignIn) {
         try {
             PreparedStatement pstmt
@@ -243,6 +249,7 @@ public class DBReaderImplementation implements IClientServer {
      *
      * @return a new ID.
      */
+
     protected int generateID() {
         List<Integer> l
                 = new ArrayList<Integer>();
@@ -282,7 +289,7 @@ public class DBReaderImplementation implements IClientServer {
                 .max((i1, i2) -> i1 - i2).get() + 1;
     }
 
-    protected int count() {
+    protected int count() { //unused
         try {
             ResultSet rs
                     = con.prepareStatement(count).executeQuery();
@@ -302,6 +309,7 @@ public class DBReaderImplementation implements IClientServer {
     /**
      * @return this instant timestamp
      */
+    
     private Timestamp rightNow() {
         return Timestamp.valueOf(LocalDateTime.now());
     }

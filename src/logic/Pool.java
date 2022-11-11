@@ -9,9 +9,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author Eneko
  */
+
 public abstract class Pool {
 
     private static Stack stack = new Stack();
