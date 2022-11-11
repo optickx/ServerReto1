@@ -7,7 +7,7 @@ package except;
 
 /**
  *
- * @author 2dam
+ * @author Roke
  */
 public class ServerCapacityException extends Exception {
 

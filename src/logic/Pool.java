@@ -8,8 +8,12 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author Eneko
+ */
 public class Pool {
-    
+
     private static Stack stack = new Stack();
     private static Connection con;
     private final ResourceBundle config
@@ -19,7 +23,11 @@ public class Pool {
     private final String url = config.getString("URL"),
             user = config.getString("USER"),
             pass = config.getString("PASS");
-    
+
+    /**
+     *
+     * @return the connection with the selected database
+     */
     public Connection openConnection() {
         con = null;
         try {
@@ -31,20 +39,29 @@ public class Pool {
         }
         return con;
     }
-    
+
+    /**
+     *
+     * @return if the stack is empty it gives a new connection, else the stack
+     * returns a connection
+     */
     public Connection getConnection() {
         if (!stack.empty()) {
             return (Connection) stack.pop();
         } else {
             return openConnection();
-            
+
         }
     }
-    
+
     public void returnConnection(Connection con) {
         stack.push(con);
     }
-    
+
+    /**
+     * When the server is closed, it gets all the connectios from the stack and
+     * closes them
+     */
     public static void removeAll() {
         while (!stack.isEmpty()) {
             con = (Connection) stack.pop();
@@ -56,5 +73,5 @@ public class Pool {
         }
         stack.clear();
     }
-    
+
 }
