@@ -23,9 +23,9 @@ DROP TABLE IF EXISTS `signin`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `signin` (
-  `lastSignIn` timestamp NOT NULL,
+  `lastSignIn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `id` int(11) NOT NULL,
-  PRIMARY KEY (`lastSignIn`,`id`) USING BTREE,
+  PRIMARY KEY (`id`) USING BTREE,
   KEY `id` (`id`),
   CONSTRAINT `id` FOREIGN KEY (`id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -37,6 +37,7 @@ CREATE TABLE `signin` (
 
 LOCK TABLES `signin` WRITE;
 /*!40000 ALTER TABLE `signin` DISABLE KEYS */;
+INSERT INTO `signin` VALUES ('2022-11-11 09:14:47',1),('2022-11-11 09:15:10',2),('2022-11-11 09:15:30',3),('2022-11-11 09:15:52',4);
 /*!40000 ALTER TABLE `signin` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -57,7 +58,7 @@ CREATE TABLE `user` (
   `userStatus` int(2) DEFAULT NULL,
   `privilege` int(2) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY (`login`, `email`)
+  UNIQUE KEY `login` (`login`,`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -67,6 +68,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'EnekoRuiz','enekoerre@gmail.com','Eneko Ruiz','abcd*1234','2022-11-11 09:14:47',0,0),(2,'roke','roke@gmail.com','Roke Iturralde','abcd*1234','2022-11-11 09:15:10',0,0),(3,'nerea','nereaoceja@gmail.com','Nerea Oceja','abcd*1234','2022-11-11 09:15:30',0,0),(4,'dani','danielbarrios@gmail.com','Daniel Barrios','abcd*1234','2022-11-11 09:15:52',0,0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -79,4 +81,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-11-02  9:31:35
+-- Dump completed on 2022-11-11 10:40:50
