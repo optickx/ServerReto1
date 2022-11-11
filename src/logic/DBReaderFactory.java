@@ -18,10 +18,8 @@ public abstract class DBReaderFactory {
      * @return a DBReaderImplementation
      */
     public static IClientServer getAccess() {
-        if (idbr == null) {
-            Pool pool = new Pool();
-            idbr = new DBReaderImplementation(pool.getConnection());
-        }
+        if (idbr == null) 
+            idbr = new DBReaderImplementation(Pool.getConnection());
 
         return idbr;
     }

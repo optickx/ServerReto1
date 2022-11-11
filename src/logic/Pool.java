@@ -12,27 +12,24 @@ import java.util.logging.Logger;
  *
  * @author Eneko
  */
-public class Pool {
+public abstract class Pool {
 
     private static Stack stack = new Stack();
     private static Connection con;
-    private final ResourceBundle config
-            = ResourceBundle.getBundle("resources.database_access");
-
-    // store the credentials in local Strings.
-    private final String url = config.getString("URL"),
-            user = config.getString("USER"),
-            pass = config.getString("PASS");
+    private static final ResourceBundle config =
+        ResourceBundle.getBundle("resources.database_access");
 
     /**
-     *
      * @return the connection with the selected database
      */
-    public Connection openConnection() {
+    public static Connection openConnection() {
         con = null;
         try {
             con = DriverManager
-                    .getConnection(url, user, pass);
+                    .getConnection(config.getString("URL"), 
+                    config.getString("USER"), 
+                    config.getString("PASSWORD"));
+
             stack.add(con);
         } catch (SQLException ex) {
             Logger.getLogger(Pool.class.getName()).log(Level.SEVERE, null, ex);
@@ -45,7 +42,7 @@ public class Pool {
      * @return if the stack is empty it gives a new connection, else the stack
      * returns a connection
      */
-    public Connection getConnection() {
+    public static Connection getConnection() {
         if (!stack.empty()) {
             return (Connection) stack.pop();
         } else {
@@ -54,7 +51,7 @@ public class Pool {
         }
     }
 
-    public void returnConnection(Connection con) {
+    public static void returnConnection(Connection con) {
         stack.push(con);
     }
 
