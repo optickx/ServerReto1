@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import logic.objects.*;
 import logic.objects.message.Response;
 
+/**
+ *
+ * @author Eneko,Roke
+ */
 public class DBReaderImplementation implements IClientServer {
 
     /**
@@ -33,8 +37,7 @@ public class DBReaderImplementation implements IClientServer {
      * password. theoretically, the user should have only, and this means ONLY,
      * the login and the password.
      *
-     * @param user
-     * @param pUser object that contains the credentials.
+     * @param user object that contains the credentials.
      * @return a new User with all it's data. if there's nothing found, an empty
      * (null) value.
      * @throws except.LoginCredentialException
@@ -124,15 +127,17 @@ public class DBReaderImplementation implements IClientServer {
             List<Timestamp> l
                     = pUser.getLastLogins();
             if (l != null) {
-                if (l.size() >= 10) 
-                    for (int i = 0; 9 < l.size(); i++) 
-                        l.remove(i);               
+                if (l.size() >= 10) {
+                    for (int i = 0; 9 < l.size(); i++) {
+                        l.remove(i);
+                    }
+                }
+            } else {
+                l = new ArrayList<Timestamp>();
             }
-            else
-                l = new ArrayList <Timestamp> ();
-            
+
             l.add(rightNow());
-            
+
             l.forEach(t -> insertSignIn(ID, t));
 
             pUser.setLastLogins(l);

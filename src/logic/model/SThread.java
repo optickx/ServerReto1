@@ -24,7 +24,7 @@ import logic.objects.message.types.ResponseType;
 
 /**
  *
- * @author 2dam
+ * @author Eneko,Roke
  */
 public class SThread extends Thread {
 
@@ -34,16 +34,20 @@ public class SThread extends Thread {
         this.socket = socket;
     }
 
+    /**
+     * this method opens the request and does the method requested, then a
+     * response is created either with an exception or with an OK advice
+     */
     public void run() {
         ObjectOutputStream write = null;
         ObjectInputStream read = null;
         Response response = null;
         try {
             User user = null;
-            //Se abren los flujos de trabajo
+            //Open streams
             read = new ObjectInputStream(socket.getInputStream());
             write = new ObjectOutputStream(socket.getOutputStream());
-            //Se carga el request y se crea la implementacion
+            //implementation created and request readed
             Request request = (Request) read.readObject();
             IClientServer dbReader = DBReaderFactory.getAccess();
 
@@ -54,7 +58,7 @@ public class SThread extends Thread {
                 response = dbReader.signUp(request.getUser());
 
             }
-            //Mandas los datos al cliente con todo correcto
+            //Sending the data to the client
             response.setResponseType(ResponseType.OK);
 
         } catch (EmailExistsException e) {
@@ -72,7 +76,7 @@ public class SThread extends Thread {
                 read.close();
                 ControllerThread.closeThread();
             } catch (IOException ex) {
-                //Logger.getLogger(SThread.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SThread.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }

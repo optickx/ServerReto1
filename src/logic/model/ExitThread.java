@@ -12,13 +12,17 @@ import logic.Pool;
 
 /**
  *
- * @author 2dam
+ * @author Roke
  */
 public class ExitThread extends Thread {
 
     private boolean active = true;
     private static final Logger LOGGER = Logger.getLogger(ExitThread.class.getName());
 
+    /**
+     * Waits until there is an exit command, then closes all the connections and
+     * exits
+     */
     public void run() {
         while (active) {
             LOGGER.info("WRITE EXIT FOR CLOSING THE SERVER");
