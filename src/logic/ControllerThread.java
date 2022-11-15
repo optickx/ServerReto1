@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ResourceBundle;
 import logic.model.ExitThread;
 import logic.model.SThread;
 import logic.objects.message.Response;
@@ -28,8 +29,10 @@ public class ControllerThread {
      */
     public void run() throws ServerCapacityException, IOException {
         ServerSocket miServidor = null;
+        int port = Integer.parseInt(ResourceBundle.getBundle("resources.port").getString("PORT"));
         Socket socket = null;
-        miServidor = new ServerSocket(9107);
+        miServidor = new ServerSocket(port);
+       
         createExitThread();
         for (;;) {
             contadorHilos(socket);
